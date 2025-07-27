@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Navigation } from "@/components/navigation"
 import { FlightSearch } from "@/components/flight-search"
 import { Button } from "@/components/ui/button"
@@ -11,152 +11,96 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
-import { Plane, Filter, Wifi, Coffee, Utensils, Star, Heart } from "lucide-react"
-
-interface Flight {
-  id: string
-  airline: string
-  logo: string
-  flightNumber: string
-  departure: {
-    airport: string
-    city: string
-    time: string
-    date: string
-  }
-  arrival: {
-    airport: string
-    city: string
-    time: string
-    date: string
-  }
-  duration: string
-  stops: number
-  price: number
-  class: string
-  amenities: string[]
-  rating: number
-  baggage: string
-}
-
-const mockFlights: Flight[] = [
-  {
-    id: "1",
-    airline: "Delta Airlines",
-    logo: "/placeholder.svg?height=40&width=40",
-    flightNumber: "DL 1234",
-    departure: {
-      airport: "JFK",
-      city: "New York",
-      time: "08:30",
-      date: "2024-03-15",
-    },
-    arrival: {
-      airport: "LAX",
-      city: "Los Angeles",
-      time: "11:45",
-      date: "2024-03-15",
-    },
-    duration: "6h 15m",
-    stops: 0,
-    price: 299,
-    class: "Economy",
-    amenities: ["wifi", "entertainment", "meals"],
-    rating: 4.5,
-    baggage: "1 carry-on, 1 checked bag",
-  },
-  {
-    id: "2",
-    airline: "American Airlines",
-    logo: "/placeholder.svg?height=40&width=40",
-    flightNumber: "AA 5678",
-    departure: {
-      airport: "JFK",
-      city: "New York",
-      time: "14:20",
-      date: "2024-03-15",
-    },
-    arrival: {
-      airport: "LAX",
-      city: "Los Angeles",
-      time: "17:35",
-      date: "2024-03-15",
-    },
-    duration: "6h 15m",
-    stops: 0,
-    price: 349,
-    class: "Economy",
-    amenities: ["wifi", "entertainment"],
-    rating: 4.2,
-    baggage: "1 carry-on, 1 checked bag",
-  },
-  {
-    id: "3",
-    airline: "United Airlines",
-    logo: "/placeholder.svg?height=40&width=40",
-    flightNumber: "UA 9012",
-    departure: {
-      airport: "JFK",
-      city: "New York",
-      time: "19:45",
-      date: "2024-03-15",
-    },
-    arrival: {
-      airport: "LAX",
-      city: "Los Angeles",
-      time: "23:00",
-      date: "2024-03-15",
-    },
-    duration: "6h 15m",
-    stops: 0,
-    price: 279,
-    class: "Economy",
-    amenities: ["wifi", "entertainment", "meals"],
-    rating: 4.3,
-    baggage: "1 carry-on, 1 checked bag",
-  },
-]
+import { Plane, Filter, Calendar, MapPin, DollarSign, Star, Heart, Loader2, ArrowLeftRight } from "lucide-react"
+import { useFlightSearch } from "@/hooks/use-flight-search"
+import { Flight } from "@/lib/api"
+import { getAirportLocation } from "@/lib/airports"
 
 export default function FlightsPage() {
-  const [flights, setFlights] = useState<Flight[]>(mockFlights)
-  const [sortBy, setSortBy] = useState("price")
-  const [priceRange, setPriceRange] = useState([0, 1000])
-  const [selectedAirlines, setSelectedAirlines] = useState<string[]>([])
-  const [stopsFilter, setStopsFilter] = useState<string>("any")
+  const { flights: mettaFlights, loading, error, getAllFlights, searchFlights } = useFlightSearch()
+  const [filteredFlights, setFilteredFlights] = useState<Flight[]>([])
+  const [sortBy, setSortBy] = useState("cost")
+  const [priceRange, setPriceRange] = useState([0, 10000])
+  const [selectedSources, setSelectedSources] = useState<string[]>([])
+  const [selectedDestinations, setSelectedDestinations] = useState<string[]>([])
   const [showFilters, setShowFilters] = useState(false)
+  const [hasSearched, setHasSearched] = useState(false)
 
-  const handleSearch = (searchData: any) => {
-    // In a real app, this would make an API call
-    console.log("Search data:", searchData)
-    // For demo, we'll just show the existing flights
+  // Update filtered flights when MeTTa flights change
+  useEffect(() => {
+    setFilteredFlights(mettaFlights)
+  }, [mettaFlights])
+
+  const handleSearch = async (searchData: any) => {
+    setHasSearched(true)
+    
+    // Extract search parameters from the search data
+    const year = searchData.departDate?.getFullYear()
+    const month = searchData.departDate ? searchData.departDate.getMonth() + 1 : undefined
+    const day = searchData.departDate?.getDate()
+    
+    const searchParams = {
+      source: searchData.from || undefined,
+      destination: searchData.to || undefined,
+      year,
+      month,
+      day,
+    }
+    
+    await searchFlights(searchParams)
   }
 
-  const sortedFlights = [...flights].sort((a, b) => {
-    switch (sortBy) {
-      case "price":
-        return a.price - b.price
-      case "duration":
-        return a.duration.localeCompare(b.duration)
-      case "departure":
-        return a.departure.time.localeCompare(b.departure.time)
-      case "rating":
-        return b.rating - a.rating
-      default:
-        return 0
-    }
-  })
+  // Get unique sources and destinations for filters
+  const uniqueSources = [...new Set(mettaFlights.map(f => f.source))].sort()
+  const uniqueDestinations = [...new Set(mettaFlights.map(f => f.destination))].sort()
 
-  const getAmenityIcon = (amenity: string) => {
-    switch (amenity) {
-      case "wifi":
-        return <Wifi className="h-4 w-4" />
-      case "entertainment":
-        return <Star className="h-4 w-4" />
-      case "meals":
-        return <Utensils className="h-4 w-4" />
-      default:
-        return <Coffee className="h-4 w-4" />
+  // Apply filters and sorting
+  const sortedAndFilteredFlights = filteredFlights
+    .filter(flight => {
+      const cost = parseInt(flight.cost)
+      const inPriceRange = cost >= priceRange[0] && cost <= priceRange[1]
+      const sourceMatch = selectedSources.length === 0 || selectedSources.includes(flight.source)
+      const destMatch = selectedDestinations.length === 0 || selectedDestinations.includes(flight.destination)
+      return inPriceRange && sourceMatch && destMatch
+    })
+    .sort((a, b) => {
+      switch (sortBy) {
+        case "cost":
+          return parseInt(a.cost) - parseInt(b.cost)
+        case "date":
+          const dateA = new Date(`${a.year}-${a.month}-${a.day}`)
+          const dateB = new Date(`${b.year}-${b.month}-${b.day}`)
+          return dateA.getTime() - dateB.getTime()
+        case "source":
+          return a.source.localeCompare(b.source)
+        case "destination":
+          return a.destination.localeCompare(b.destination)
+        default:
+          return 0
+      }
+    })
+
+  const formatDate = (year: string, month: string, day: string) => {
+    // Pad month and day with zeros if needed
+    const paddedMonth = month.padStart(2, '0')
+    const paddedDay = day.padStart(2, '0')
+    const date = new Date(`${year}-${paddedMonth}-${paddedDay}`)
+    
+    // Check if the date is valid
+    if (isNaN(date.getTime())) {
+      return `${month}/${day}/${year}`
     }
+    
+    return date.toLocaleDateString('en-US', { 
+      weekday: 'short', 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
+    })
+  }
+
+  const formatCost = (cost: string) => {
+    return `$${parseInt(cost).toLocaleString()}`
   }
 
   return (
@@ -191,9 +135,9 @@ export default function FlightsPage() {
                   <Slider
                     value={priceRange}
                     onValueChange={setPriceRange}
-                    max={1000}
+                    max={10000}
                     min={0}
-                    step={50}
+                    step={100}
                     className="mb-2"
                   />
                   <div className="flex justify-between text-sm text-muted-foreground">
@@ -204,26 +148,24 @@ export default function FlightsPage() {
 
                 <Separator />
 
-                {/* Airlines */}
+                {/* Source Airports */}
                 <div>
-                  <Label className="text-sm font-medium mb-3 block">Airlines</Label>
-                  <div className="space-y-2">
-                    {["Delta Airlines", "American Airlines", "United Airlines"].map((airline) => (
-                      <div key={airline} className="flex items-center space-x-2">
+                  <Label className="text-sm font-medium mb-3 block">Source Airports</Label>
+                  <div className="space-y-2 max-h-40 overflow-y-auto">
+                    {uniqueSources.map((source) => (
+                      <div key={source} className="flex items-center space-x-2">
                         <Checkbox
-                          id={airline}
-                          checked={selectedAirlines.includes(airline)}
+                          id={`source-${source}`}
+                          checked={selectedSources.includes(source)}
                           onCheckedChange={(checked) => {
                             if (checked) {
-                              setSelectedAirlines([...selectedAirlines, airline])
+                              setSelectedSources([...selectedSources, source])
                             } else {
-                              setSelectedAirlines(selectedAirlines.filter((a) => a !== airline))
+                              setSelectedSources(selectedSources.filter(s => s !== source))
                             }
                           }}
                         />
-                        <Label htmlFor={airline} className="text-sm">
-                          {airline}
-                        </Label>
+                        <Label htmlFor={`source-${source}`} className="text-sm">{source}</Label>
                       </div>
                     ))}
                   </div>
@@ -231,20 +173,27 @@ export default function FlightsPage() {
 
                 <Separator />
 
-                {/* Stops */}
+                {/* Destination Airports */}
                 <div>
-                  <Label className="text-sm font-medium mb-3 block">Stops</Label>
-                  <Select value={stopsFilter} onValueChange={setStopsFilter}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="any">Any number of stops</SelectItem>
-                      <SelectItem value="0">Non-stop</SelectItem>
-                      <SelectItem value="1">1 stop</SelectItem>
-                      <SelectItem value="2+">2+ stops</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Label className="text-sm font-medium mb-3 block">Destination Airports</Label>
+                  <div className="space-y-2 max-h-40 overflow-y-auto">
+                    {uniqueDestinations.map((destination) => (
+                      <div key={destination} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`dest-${destination}`}
+                          checked={selectedDestinations.includes(destination)}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setSelectedDestinations([...selectedDestinations, destination])
+                            } else {
+                              setSelectedDestinations(selectedDestinations.filter(d => d !== destination))
+                            }
+                          }}
+                        />
+                        <Label htmlFor={`dest-${destination}`} className="text-sm">{destination}</Label>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -252,131 +201,161 @@ export default function FlightsPage() {
 
           {/* Results Section */}
           <div className="lg:col-span-3">
-            {/* Sort and Results Header */}
+            {/* Results Header */}
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2 className="text-2xl font-bold">Flight Results</h2>
-                <p className="text-muted-foreground">{flights.length} flights found</p>
+                <p className="text-muted-foreground">
+                  {!hasSearched ? "Nothing searched yet" : loading ? "Loading flights..." : mettaFlights.length > 0 ? `${sortedAndFilteredFlights.length} flights found` : "Search for flights to get started"}
+                </p>
               </div>
-              <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="price">Price (Low to High)</SelectItem>
-                  <SelectItem value="duration">Duration</SelectItem>
-                  <SelectItem value="departure">Departure Time</SelectItem>
-                  <SelectItem value="rating">Rating</SelectItem>
-                </SelectContent>
-              </Select>
+              
+              <div className="flex items-center space-x-4">
+                <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger className="w-40">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="cost">Price: Low to High</SelectItem>
+                    <SelectItem value="date">Date</SelectItem>
+                    <SelectItem value="source">Source</SelectItem>
+                    <SelectItem value="destination">Destination</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
-            {/* Flight Cards */}
-            <div className="space-y-4">
-              {sortedFlights.map((flight) => (
-                <Card key={flight.id} className="hover:shadow-lg transition-shadow">
-                  <CardContent className="p-6">
-                    <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
-                      {/* Airline Info */}
-                      <div className="md:col-span-2">
-                        <div className="flex items-center space-x-3">
-                          <img
-                            src={flight.logo || "/placeholder.svg"}
-                            alt={flight.airline}
-                            className="w-10 h-10 rounded"
-                          />
-                          <div>
-                            <p className="font-medium text-sm">{flight.airline}</p>
-                            <p className="text-xs text-muted-foreground">{flight.flightNumber}</p>
-                          </div>
-                        </div>
-                      </div>
+            {/* Loading State */}
+            {hasSearched && loading && (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin mr-2" />
+                <span>Loading flights...</span>
+              </div>
+            )}
 
-                      {/* Flight Times */}
-                      <div className="md:col-span-6">
-                        <div className="flex items-center justify-between">
-                          <div className="text-center">
-                            <p className="text-2xl font-bold">{flight.departure.time}</p>
-                            <p className="text-sm text-muted-foreground">{flight.departure.airport}</p>
-                            <p className="text-xs text-muted-foreground">{flight.departure.city}</p>
-                          </div>
+            {/* Error State */}
+            {error && (
+              <Card className="border-destructive">
+                <CardContent className="pt-6">
+                  <div className="text-center text-destructive">
+                    <p>Error loading flights: {error}</p>
+                    <Button onClick={getAllFlights} className="mt-2">Try Again</Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
-                          <div className="flex-1 mx-4">
-                            <div className="flex items-center justify-center space-x-2">
-                              <div className="flex-1 h-px bg-border"></div>
-                              <div className="text-center">
-                                <Plane className="h-4 w-4 text-muted-foreground mx-auto mb-1" />
-                                <p className="text-xs text-muted-foreground">{flight.duration}</p>
-                                {flight.stops === 0 ? (
-                                  <Badge variant="secondary" className="text-xs">
-                                    Non-stop
-                                  </Badge>
-                                ) : (
-                                  <Badge variant="outline" className="text-xs">
-                                    {flight.stops} stop{flight.stops > 1 ? "s" : ""}
-                                  </Badge>
-                                )}
-                              </div>
-                              <div className="flex-1 h-px bg-border"></div>
-                            </div>
-                          </div>
+            {/* No Results */}
+            {!hasSearched && !loading && !error && (
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="text-center">
+                    <Plane className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                    <h3 className="text-lg font-semibold mb-2">Ready to search flights</h3>
+                    <p className="text-muted-foreground mb-4">
+                      Use the search form above to find flights from our 2013 database.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
-                          <div className="text-center">
-                            <p className="text-2xl font-bold">{flight.arrival.time}</p>
-                            <p className="text-sm text-muted-foreground">{flight.arrival.airport}</p>
-                            <p className="text-xs text-muted-foreground">{flight.arrival.city}</p>
-                          </div>
-                        </div>
-                      </div>
+            {/* No Search Results */}
+            {hasSearched && !loading && !error && sortedAndFilteredFlights.length === 0 && (
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="text-center">
+                    <Plane className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                    <h3 className="text-lg font-semibold mb-2">No flights found</h3>
+                    <p className="text-muted-foreground mb-4">
+                      Try adjusting your search criteria or filters.
+                    </p>
+                    <Button onClick={() => {
+                      setSelectedSources([])
+                      setSelectedDestinations([])
+                      setPriceRange([0, 10000])
+                    }}>
+                      Clear Filters
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
-                      {/* Price and Book */}
-                      <div className="md:col-span-4 text-right">
-                        <div className="flex items-center justify-end space-x-4">
-                          <div>
-                            <p className="text-3xl font-bold text-primary">${flight.price}</p>
-                            <p className="text-sm text-muted-foreground">{flight.class}</p>
-                            <div className="flex items-center justify-end mt-1">
-                              <Star className="h-3 w-3 fill-yellow-400 text-yellow-400 mr-1" />
-                              <span className="text-xs text-muted-foreground">{flight.rating}</span>
-                            </div>
-                          </div>
-                          <Button className="flight-gradient text-white">Select Flight</Button>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Flight Details */}
-                    <div className="mt-4 pt-4 border-t">
+            {/* Flight Results */}
+            {hasSearched && !loading && !error && sortedAndFilteredFlights.length > 0 && (
+              <div className="space-y-4">
+                {sortedAndFilteredFlights.map((flight, index) => (
+                  <Card key={`${flight.source}-${flight.destination}-${flight.year}-${flight.month}-${flight.day}-${index}`} className="hover:shadow-md transition-shadow">
+                    <CardContent className="p-6">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-4">
-                          <div className="flex items-center space-x-2">
-                            {flight.amenities.map((amenity, index) => (
-                              <div key={index} className="flex items-center space-x-1 text-muted-foreground">
-                                {getAmenityIcon(amenity)}
-                                <span className="text-xs capitalize">{amenity}</span>
-                              </div>
-                            ))}
+                          <div className="flex items-center justify-center w-12 h-12 bg-primary/10 rounded-full">
+                            <Plane className="h-6 w-6 text-primary" />
                           </div>
-                          <Separator orientation="vertical" className="h-4" />
-                          <p className="text-xs text-muted-foreground">{flight.baggage}</p>
+                          
+                          <div className="space-y-1">
+                            <div className="flex items-center space-x-8">
+                              <div className="flex items-center space-x-2">
+                                <MapPin className="h-4 w-4 text-muted-foreground" />
+                                <div>
+                                  <span className="font-medium">{flight.source}</span>
+                                  <div className="text-xs text-muted-foreground">
+                                    {getAirportLocation(flight.source)}
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              {/* Arrow separator */}
+                              <div className="flex items-center text-muted-foreground">
+                                <ArrowLeftRight className="h-4 w-4" />
+                              </div>
+                              
+                              <div className="flex items-center space-x-2">
+                                <MapPin className="h-4 w-4 text-muted-foreground" />
+                                <div>
+                                  <span className="font-medium">{flight.destination}</span>
+                                  <div className="text-xs text-muted-foreground">
+                                    {getAirportLocation(flight.destination)}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+                              <div className="flex items-center space-x-1">
+                                <Calendar className="h-4 w-4" />
+                                <span>{formatDate(flight.year, flight.month, flight.day)}</span>
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                        <Button variant="ghost" size="sm">
-                          <Heart className="h-4 w-4 mr-1" />
-                          Save
+
+                        <div className="text-right">
+                          <div className="text-2xl font-bold text-primary">
+                            {formatCost(flight.cost)}
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            MeTTa Flight
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="mt-4 flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <Badge variant="secondary">Direct Flight</Badge>
+                          <Badge variant="outline">MeTTa Data</Badge>
+                        </div>
+                        
+                        <Button size="sm">
+                          Select Flight
                         </Button>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-
-            {/* Load More */}
-            <div className="text-center mt-8">
-              <Button variant="outline" size="lg">
-                Load More Flights
-              </Button>
-            </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
