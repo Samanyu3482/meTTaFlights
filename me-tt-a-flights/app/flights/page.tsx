@@ -29,6 +29,9 @@ export default function FlightsPage() {
   // Update filtered flights when MeTTa flights change
   useEffect(() => {
     setFilteredFlights(mettaFlights)
+    if (mettaFlights.length > 0) {
+      console.log('Updated flights with airline data:', mettaFlights)
+    }
   }, [mettaFlights])
 
   const handleSearch = async (searchData: any) => {
@@ -47,7 +50,11 @@ export default function FlightsPage() {
       day,
     }
     
-    await searchFlights(searchParams)
+    try {
+      await searchFlights(searchParams)
+    } catch (err) {
+      console.error('Search error:', err)
+    }
   }
 
   // Get unique sources and destinations for filters
@@ -290,9 +297,28 @@ export default function FlightsPage() {
                     <CardContent className="p-6">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-4">
-                          <div className="flex items-center justify-center w-12 h-12 bg-primary/10 rounded-full">
-                            <Plane className="h-6 w-6 text-primary" />
-                          </div>
+                          {flight.airline ? (
+                            <div className="flex items-center justify-center w-12 h-12 bg-white border rounded-lg overflow-hidden relative">
+                              <img 
+                                src={flight.airline.logo} 
+                                alt={flight.airline.name}
+                                className="w-full h-full object-contain p-1"
+                                onError={(e) => {
+                                  // Fallback to plane icon if image fails to load
+                                  e.currentTarget.style.display = 'none';
+                                  const fallback = e.currentTarget.parentElement?.querySelector('.fallback-icon');
+                                  if (fallback) {
+                                    fallback.classList.remove('hidden');
+                                  }
+                                }}
+                              />
+                              <Plane className="h-6 w-6 text-primary hidden fallback-icon absolute inset-0 m-auto" />
+                            </div>
+                          ) : (
+                            <div className="flex items-center justify-center w-12 h-12 bg-primary/10 rounded-full">
+                              <Plane className="h-6 w-6 text-primary" />
+                            </div>
+                          )}
                           
                           <div className="space-y-1">
                             <div className="flex items-center space-x-8">
@@ -327,6 +353,13 @@ export default function FlightsPage() {
                                 <Calendar className="h-4 w-4" />
                                 <span>{formatDate(flight.year, flight.month, flight.day)}</span>
                               </div>
+                              {flight.airline && (
+                                <div className="flex items-center space-x-1">
+                                  <span className="text-xs font-medium text-primary">{flight.airline.code}</span>
+                                  <span>•</span>
+                                  <span className="text-xs">{flight.airline.name}</span>
+                                </div>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -336,7 +369,7 @@ export default function FlightsPage() {
                             {formatCost(flight.cost)}
                           </div>
                           <div className="text-sm text-muted-foreground">
-                            MeTTa Flight
+                            {flight.airline ? flight.airline.name : 'MeTTa Flight'}
                           </div>
                         </div>
                       </div>
@@ -344,6 +377,11 @@ export default function FlightsPage() {
                       <div className="mt-4 flex items-center justify-between">
                         <div className="flex items-center space-x-2">
                           <Badge variant="secondary">Direct Flight</Badge>
+                          {flight.airline && (
+                            <Badge variant="outline" className="text-xs">
+                              {flight.airline.code}
+                            </Badge>
+                          )}
                           <Badge variant="outline">MeTTa Data</Badge>
                         </div>
                         

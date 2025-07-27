@@ -8,6 +8,13 @@ export interface FlightSearchParams {
   day?: number;
 }
 
+export interface AirlineInfo {
+  code: string;
+  name: string;
+  logo: string;
+  description: string;
+}
+
 export interface Flight {
   year: string;
   month: string;
@@ -15,6 +22,7 @@ export interface Flight {
   source: string;
   destination: string;
   cost: string;
+  airline?: AirlineInfo;
 }
 
 export interface FlightSearchRequest {
