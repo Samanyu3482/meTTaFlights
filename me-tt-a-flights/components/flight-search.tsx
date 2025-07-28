@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge"
 import { CalendarIcon, Search, MapPin, Users, ArrowLeftRight } from "lucide-react"
 import { format } from "date-fns"
 import { getAirportLocation } from "@/lib/airports"
+import { AirportAutocomplete } from "./airport-autocomplete"
 
 interface FlightSearchProps {
   onSearch?: (searchData: any) => void
@@ -89,17 +90,12 @@ export function FlightSearch({ onSearch, className }: FlightSearchProps) {
               <div className="space-y-3">
                 <div className="flex items-center justify-center gap-4">
                   <div className="flex-1 max-w-[280px]">
-                    <Label htmlFor="from">From</Label>
-                    <div className="relative mt-1">
-                      <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="from"
-                        placeholder="Airport code (e.g., EWR, JFK, ATL)"
-                        value={from}
-                        onChange={(e) => setFrom(e.target.value)}
-                        className="pl-10"
-                      />
-                    </div>
+                    <AirportAutocomplete
+                      value={from}
+                      onChange={setFrom}
+                      label="From"
+                      placeholder="Search airports (code, name, or city)"
+                    />
                   </div>
 
                   {/* Swap button in the center */}
@@ -114,24 +110,19 @@ export function FlightSearch({ onSearch, className }: FlightSearchProps) {
                   </Button>
 
                   <div className="flex-1 max-w-[280px]">
-                    <Label htmlFor="to">To</Label>
-                    <div className="relative mt-1">
-                      <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="to"
-                        placeholder="Airport code (e.g., EWR, JFK, ATL)"
-                        value={to}
-                        onChange={(e) => setTo(e.target.value)}
-                        className="pl-10"
-                      />
-                    </div>
+                    <AirportAutocomplete
+                      value={to}
+                      onChange={setTo}
+                      label="To"
+                      placeholder="Search airports (code, name, or city)"
+                    />
                   </div>
                 </div>
 
-                {/* Popular airports text */}
+                {/* Search tips */}
                 <div className="text-center">
                   <p className="text-xs text-muted-foreground leading-relaxed">
-                    Popular: EWR (Newark), JFK (New York), ATL (Atlanta), BOS (Boston), SEA (Seattle), BNA (Nashville), AUS (Austin), BDL (Hartford)
+                    💡 Try typing: airport codes (LAX), city names (Los Angeles), or airport names (Kennedy)
                   </p>
                 </div>
               </div>

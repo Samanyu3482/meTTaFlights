@@ -10,7 +10,7 @@ import random
 from typing import Dict, Optional, List
 
 class AirlineService:
-    def __init__(self, mapping_file: str = 'airline_mapping_enhanced.json'):
+    def __init__(self, mapping_file: str = 'airline_mapping_multi_complete.json'):
         """Initialize airline service with enhanced mapping data"""
         self.mapping_file = mapping_file
         self.airline_data = None
@@ -37,29 +37,49 @@ class AirlineService:
     
     def _load_fallback_data(self):
         """Load fallback data from original airline mapping file"""
-        fallback_file = 'airline_mapping_enhanced.json'
-        if not os.path.exists(fallback_file):
-            fallback_file = 'airline_mapping.json'
-        try:
+        # Try complete mapping first, then enhanced, then original
+        fallback_files = ['airline_mapping_complete.json', 'airline_mapping_enhanced.json', 'airline_mapping.json']
+        
+        for fallback_file in fallback_files:
             if os.path.exists(fallback_file):
-                with open(fallback_file, 'r') as f:
-                    fallback_data = json.load(f)
-                    self.airlines = fallback_data.get('airlines', {})
-                    # Convert old format to new format
-                    old_route_mapping = fallback_data.get('route_mapping', {})
-                    self.route_mapping = {}
-                    for route, airline_code in old_route_mapping.items():
-                        self.route_mapping[route] = {
-                            "airlines": [airline_code],
-                            "frequencies": {airline_code: 1.0}
-                        }
-                print(f"✅ Loaded fallback airline data: {len(self.airlines)} airlines, {len(self.route_mapping)} routes")
-            else:
-                print(f"❌ No airline mapping files found")
-                self.airline_data = {'airlines': {}, 'route_mapping': {}}
-        except Exception as e:
-            print(f"❌ Error loading fallback data: {e}")
-            self.airline_data = {'airlines': {}, 'route_mapping': {}}
+                try:
+                    with open(fallback_file, 'r') as f:
+                        fallback_data = json.load(f)
+                        self.airlines = fallback_data.get('airlines', {})
+                        
+                        # Handle different mapping formats
+                        if 'route_mapping' in fallback_data:
+                            route_mapping = fallback_data.get('route_mapping', {})
+                            # Convert to new format if needed
+                            self.route_mapping = {}
+                            for route, route_info in route_mapping.items():
+                                if isinstance(route_info, str):
+                                    # Old format - single airline
+                                    self.route_mapping[route] = {
+                                        "airlines": [route_info],
+                                        "frequencies": {route_info: 1.0}
+                                    }
+                                elif isinstance(route_info, dict):
+                                    # New format - multiple airlines
+                                    self.route_mapping[route] = route_info
+                        else:
+                            # Convert old format to new format
+                            old_route_mapping = fallback_data.get('route_mapping', {})
+                            self.route_mapping = {}
+                            for route, airline_code in old_route_mapping.items():
+                                self.route_mapping[route] = {
+                                    "airlines": [airline_code],
+                                    "frequencies": {airline_code: 1.0}
+                                }
+                    
+                    print(f"✅ Loaded fallback airline data from {fallback_file}: {len(self.airlines)} airlines, {len(self.route_mapping)} routes")
+                    return
+                except Exception as e:
+                    print(f"❌ Error loading {fallback_file}: {e}")
+                    continue
+        
+        print(f"❌ No airline mapping files found")
+        self.airline_data = {'airlines': {}, 'route_mapping': {}}
     
     def get_airline_for_route(self, source: str, destination: str) -> Optional[Dict]:
         """Get airline information for a specific route with weighted random selection"""
