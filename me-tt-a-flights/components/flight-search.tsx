@@ -24,7 +24,7 @@ export function FlightSearch({ onSearch, className }: FlightSearchProps) {
   const [tripType, setTripType] = useState("roundtrip")
   const [from, setFrom] = useState("")
   const [to, setTo] = useState("")
-  const [departDate, setDepartDate] = useState<Date>(new Date(2013, 0, 1)) // Default to 2013
+  const [departDate, setDepartDate] = useState<Date>(new Date(2025, 0, 1)) // Default to 2025
   const [returnDate, setReturnDate] = useState<Date>()
   const [passengers, setPassengers] = useState("1")
   const [customPassengers, setCustomPassengers] = useState("")
@@ -129,12 +129,12 @@ export function FlightSearch({ onSearch, className }: FlightSearchProps) {
 
               {/* Quick Route Presets */}
               <div className="space-y-3">
-                <Label className="text-sm">Quick Routes (2013 Data)</Label>
+                <Label className="text-sm">Quick Routes (2025 Data)</Label>
                 <div className="flex flex-wrap gap-3">
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    onClick={() => { setFrom("JFK"); setTo("LAX"); setDepartDate(new Date(2013, 0, 1)); }}
+                                          onClick={() => { setFrom("JFK"); setTo("LAX"); setDepartDate(new Date(2025, 0, 1)); }}
                     className="text-xs"
                     title="New York JFK → Los Angeles LAX"
                   >
@@ -143,7 +143,7 @@ export function FlightSearch({ onSearch, className }: FlightSearchProps) {
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    onClick={() => { setFrom("EWR"); setTo("ATL"); setDepartDate(new Date(2013, 0, 1)); }}
+                                          onClick={() => { setFrom("EWR"); setTo("ATL"); setDepartDate(new Date(2025, 0, 1)); }}
                     className="text-xs"
                     title="Newark EWR → Atlanta ATL"
                   >
@@ -152,7 +152,7 @@ export function FlightSearch({ onSearch, className }: FlightSearchProps) {
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    onClick={() => { setFrom("EWR"); setTo("BOS"); setDepartDate(new Date(2013, 0, 1)); }}
+                                          onClick={() => { setFrom("EWR"); setTo("BOS"); setDepartDate(new Date(2025, 0, 1)); }}
                     className="text-xs"
                     title="Newark EWR → Boston BOS"
                   >
@@ -161,7 +161,7 @@ export function FlightSearch({ onSearch, className }: FlightSearchProps) {
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    onClick={() => { setFrom("EWR"); setTo("SEA"); setDepartDate(new Date(2013, 0, 1)); }}
+                                          onClick={() => { setFrom("EWR"); setTo("SEA"); setDepartDate(new Date(2025, 0, 1)); }}
                     className="text-xs"
                     title="Newark EWR → Seattle SEA"
                   >
@@ -229,7 +229,7 @@ export function FlightSearch({ onSearch, className }: FlightSearchProps) {
                 </Label>
                 <div className="flex gap-2">
                   <Select 
-                    value={departDate ? departDate.getFullYear().toString() : "2013"} 
+                    value={departDate ? departDate.getFullYear().toString() : "2025"} 
                     onValueChange={(year) => {
                       const currentDate = departDate || new Date()
                       const newDate = new Date(parseInt(year), currentDate.getMonth(), currentDate.getDate())
@@ -241,9 +241,9 @@ export function FlightSearch({ onSearch, className }: FlightSearchProps) {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="2013">
+                      <SelectItem value="2025">
                         <div className="flex items-center justify-between w-full">
-                          <span>2013</span>
+                          <span>2025</span>
                           <Badge variant="secondary" className="ml-2 text-xs">Available Data</Badge>
                         </div>
                       </SelectItem>
@@ -255,14 +255,14 @@ export function FlightSearch({ onSearch, className }: FlightSearchProps) {
                   <Button 
                     variant="outline" 
                     size="sm"
-                    onClick={() => setDepartDate(new Date(2013, 0, 1))}
+                    onClick={() => setDepartDate(new Date(2025, 0, 1))}
                     className="whitespace-nowrap"
                   >
-                    Use 2013 Data
+                    Use 2025 Data
                   </Button>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Select 2013 to search the MeTTa knowledge base with 50,000+ historical flight records
+                  Select 2025 to search the MeTTa knowledge base with 50,000+ current flight records
                 </p>
               </div>
 
