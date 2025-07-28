@@ -312,5 +312,114 @@ def get_popular_routes():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching popular routes: {str(e)}")
 
+# Airport autocomplete endpoints
+@app.get("/api/airports/search")
+def search_airports(query: str = "", limit: int = 10):
+    """
+    Search airports by code, name, or city with autocomplete functionality
+    """
+    try:
+        import json
+        import os
+        
+        # Load airport data
+        airports_file = "airports.json"
+        if not os.path.exists(airports_file):
+            return {"airports": [], "total": 0}
+        
+        with open(airports_file, 'r') as f:
+            airport_data = json.load(f)
+        
+        airports = airport_data.get('airports', [])
+        
+        if not query or len(query.strip()) == 0:
+            # Return popular airports if no query
+            popular_codes = ["JFK", "LAX", "ORD", "ATL", "DFW", "DEN", "SFO", "CLT", "LAS", "MCO"]
+            popular_airports = [ap for ap in airports if ap['code'] in popular_codes]
+            return {"airports": popular_airports[:limit], "total": len(popular_airports)}
+        
+        query = query.strip().upper()
+        results = []
+        
+        for airport in airports:
+            # Search by airport code
+            if query in airport['code']:
+                results.append(airport)
+            # Search by airport name
+            elif query in airport['name'].upper():
+                results.append(airport)
+            # Search by city
+            elif query in airport['city'].upper():
+                results.append(airport)
+            # Search by state
+            elif query in airport['state']:
+                results.append(airport)
+        
+        # Sort results: exact code matches first, then partial matches
+        def sort_key(airport):
+            if airport['code'] == query:
+                return 0  # Exact code match
+            elif airport['code'].startswith(query):
+                return 1  # Code starts with query
+            elif airport['city'].upper().startswith(query):
+                return 2  # City starts with query
+            else:
+                return 3  # Other matches
+        
+        results.sort(key=sort_key)
+        
+        return {"airports": results[:limit], "total": len(results)}
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error searching airports: {str(e)}")
+
+@app.get("/api/airports/{airport_code}")
+def get_airport_info(airport_code: str):
+    """
+    Get information about a specific airport by code
+    """
+    try:
+        import json
+        import os
+        
+        airports_file = "airports.json"
+        if not os.path.exists(airports_file):
+            raise HTTPException(status_code=404, detail="Airport data not found")
+        
+        with open(airports_file, 'r') as f:
+            airport_data = json.load(f)
+        
+        airports = airport_data.get('airports', [])
+        
+        for airport in airports:
+            if airport['code'].upper() == airport_code.upper():
+                return airport
+        
+        raise HTTPException(status_code=404, detail=f"Airport {airport_code} not found")
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching airport: {str(e)}")
+
+@app.get("/api/airports")
+def get_all_airports():
+    """
+    Get all airports (for debugging/testing)
+    """
+    try:
+        import json
+        import os
+        
+        airports_file = "airports.json"
+        if not os.path.exists(airports_file):
+            return {"airports": [], "total": 0}
+        
+        with open(airports_file, 'r') as f:
+            airport_data = json.load(f)
+        
+        return airport_data
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching airports: {str(e)}")
+
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000) 
