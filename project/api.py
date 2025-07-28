@@ -4,9 +4,9 @@ from pydantic import BaseModel
 from typing import Optional, List, Dict
 import uvicorn
 from main import load_dataset, smart_search, search_all_flights
-from airline_service import get_airline_for_route, get_all_airlines, get_airline_by_code
+from airline_service import get_airline_for_route, get_all_airlines, get_airline_by_code, get_all_airlines_for_route, get_route_competition_info
 
-app = FastAPI(title="MeTTa Flight Search API", version="1.0.0")
+app = FastAPI(title="MeTTa Flight Search API", version="2.0.0")
 
 # Add CORS middleware to allow frontend to call the API
 app.add_middleware(
@@ -30,11 +30,11 @@ except Exception as e:
     print(f"Error loading flight data: {e}")
 
 def enhance_flights_with_airline_data(flights: List[Dict]) -> List[Dict]:
-    """Add airline information to flight results"""
+    """Add airline information to flight results with enhanced multi-airline support"""
     enhanced_flights = []
     
     for flight in flights:
-        # Get airline info for this route
+        # Get airline info for this route (now with weighted random selection)
         airline_info = get_airline_for_route(flight['source'], flight['destination'])
         
         # Create enhanced flight data
@@ -63,6 +63,13 @@ class AirlineInfo(BaseModel):
     name: str
     logo: str
     description: str
+    frequency: Optional[float] = None
+
+class RouteCompetitionInfo(BaseModel):
+    route: str
+    airlines: List[AirlineInfo]
+    competition_level: str
+    airline_count: int
 
 class FlightResponse(BaseModel):
     year: str
@@ -75,16 +82,16 @@ class FlightResponse(BaseModel):
 
 @app.get("/")
 def read_root():
-    return {"message": "MeTTa Flight Search API is running!"}
+    return {"message": "Enhanced MeTTa Flight Search API is running!", "version": "2.0.0"}
 
 @app.get("/health")
 def health_check():
-    return {"status": "healthy", "message": "API is running"}
+    return {"status": "healthy", "message": "Enhanced API is running", "version": "2.0.0"}
 
 @app.post("/api/flights/search", response_model=List[FlightResponse])
 def search_flights(request: FlightSearchRequest):
     """
-    Search flights using MeTTa knowledge base
+    Search flights using MeTTa knowledge base with enhanced multi-airline support
     """
     try:
         # Convert empty strings to None
@@ -99,7 +106,7 @@ def search_flights(request: FlightSearchRequest):
             day=request.day
         )
         
-        # Enhance results with airline data
+        # Enhance results with airline data (now with weighted random selection)
         enhanced_results = enhance_flights_with_airline_data(results)
         
         return enhanced_results
@@ -109,7 +116,7 @@ def search_flights(request: FlightSearchRequest):
 @app.get("/api/flights/all", response_model=List[FlightResponse])
 def get_all_flights():
     """
-    Get all flights from the knowledge base
+    Get all flights from the knowledge base with enhanced airline data
     """
     try:
         results = search_all_flights()
@@ -124,7 +131,7 @@ def get_all_flights():
 @app.get("/api/flights/source/{source}", response_model=List[FlightResponse])
 def search_by_source_airport(source: str):
     """
-    Search flights by source airport
+    Search flights by source airport with enhanced airline data
     """
     try:
         results = smart_search(source=source.upper())
@@ -139,7 +146,7 @@ def search_by_source_airport(source: str):
 @app.get("/api/flights/destination/{destination}", response_model=List[FlightResponse])
 def search_by_destination_airport(destination: str):
     """
-    Search flights by destination airport
+    Search flights by destination airport with enhanced airline data
     """
     try:
         results = smart_search(destination=destination.upper())
@@ -154,7 +161,7 @@ def search_by_destination_airport(destination: str):
 @app.get("/api/flights/route/{source}/{destination}", response_model=List[FlightResponse])
 def search_by_route(source: str, destination: str):
     """
-    Search flights by source and destination
+    Search flights by source and destination with enhanced airline data
     """
     try:
         results = smart_search(source=source.upper(), destination=destination.upper())
@@ -166,7 +173,7 @@ def search_by_route(source: str, destination: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Search error: {str(e)}")
 
-# New airline-specific endpoints
+# Enhanced airline-specific endpoints
 @app.get("/api/airlines")
 def get_airlines():
     """
@@ -203,6 +210,107 @@ def get_airline_routes(airline_code: str):
         return {"airline_code": airline_code.upper(), "routes": routes}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching routes: {str(e)}")
+
+# New enhanced endpoints for multi-airline routes
+@app.get("/api/routes/{source}/{destination}/airlines")
+def get_route_airlines(source: str, destination: str):
+    """
+    Get all airlines that operate on a specific route
+    """
+    try:
+        airlines = get_all_airlines_for_route(source.upper(), destination.upper())
+        return {
+            "route": f"{source.upper()}-{destination.upper()}",
+            "airlines": airlines,
+            "airline_count": len(airlines)
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching route airlines: {str(e)}")
+
+@app.get("/api/routes/{source}/{destination}/competition", response_model=RouteCompetitionInfo)
+def get_route_competition(source: str, destination: str):
+    """
+    Get detailed competition information for a specific route
+    """
+    try:
+        competition_info = get_route_competition_info(source.upper(), destination.upper())
+        return competition_info
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching route competition: {str(e)}")
+
+@app.get("/api/routes/competition/analysis")
+def get_competition_analysis():
+    """
+    Get overall competition analysis across all routes
+    """
+    try:
+        from airline_service import airline_service
+        
+        # Analyze competition levels
+        competition_stats = {
+            "monopoly": 0,
+            "duopoly": 0,
+            "competitive": 0,
+            "highly_competitive": 0,
+            "none": 0
+        }
+        
+        total_routes = 0
+        
+        for route in airline_service.route_mapping.keys():
+            source, destination = route.split('-')
+            competition_info = get_route_competition_info(source, destination)
+            competition_level = competition_info['competition_level']
+            competition_stats[competition_level] += 1
+            total_routes += 1
+        
+        # Calculate percentages
+        competition_percentages = {}
+        for level, count in competition_stats.items():
+            if total_routes > 0:
+                competition_percentages[level] = round((count / total_routes) * 100, 2)
+            else:
+                competition_percentages[level] = 0
+        
+        return {
+            "total_routes": total_routes,
+            "competition_stats": competition_stats,
+            "competition_percentages": competition_percentages,
+            "summary": {
+                "most_competitive_routes": competition_stats["highly_competitive"],
+                "least_competitive_routes": competition_stats["monopoly"],
+                "average_airlines_per_route": round(sum([info['airline_count'] for info in [get_route_competition_info(route.split('-')[0], route.split('-')[1]) for route in airline_service.route_mapping.keys()]]) / total_routes, 2) if total_routes > 0 else 0
+            }
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error analyzing competition: {str(e)}")
+
+@app.get("/api/routes/popular")
+def get_popular_routes():
+    """
+    Get popular routes with airline information
+    """
+    try:
+        from airline_service import airline_service
+        
+        popular_routes = []
+        for route, flight_count in airline_service.airline_data.get('top_routes', [])[:10]:
+            source, destination = route.split('-')
+            competition_info = get_route_competition_info(source, destination)
+            
+            popular_routes.append({
+                "route": route,
+                "source": source,
+                "destination": destination,
+                "flight_count": flight_count,
+                "airlines": competition_info['airlines'],
+                "competition_level": competition_info['competition_level'],
+                "airline_count": competition_info['airline_count']
+            })
+        
+        return {"popular_routes": popular_routes}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching popular routes: {str(e)}")
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000) 

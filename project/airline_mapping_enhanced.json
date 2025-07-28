@@ -1,0 +1,430 @@
+{
+  "metadata": {
+    "total_flights": 49999,
+    "unique_routes": 208,
+    "mapped_routes": 203,
+    "coverage_percentage": 97.6,
+    "version": "2.0",
+    "description": "Enhanced airline mapping with multiple airlines per route"
+  },
+  "airlines": {
+    "AA": {
+      "name": "American Airlines",
+      "logo": "/airline-logos/aa.png",
+      "description": "Major US airline with extensive domestic network",
+      "hub_routes": ["JFK", "LAX", "ORD", "DFW", "MIA", "CLT"],
+      "typical_routes": ["JFK-LAX", "JFK-SFO", "JFK-MIA", "JFK-ORD", "JFK-DFW"]
+    },
+    "UA": {
+      "name": "United Airlines",
+      "logo": "/airline-logos/ua.png",
+      "description": "Major US airline with global network",
+      "hub_routes": ["EWR", "ORD", "DEN", "SFO", "LAX", "IAD"],
+      "typical_routes": ["EWR-LAX", "EWR-SFO", "EWR-ORD", "EWR-DEN", "EWR-IAD"]
+    },
+    "DL": {
+      "name": "Delta Air Lines",
+      "logo": "/airline-logos/dl.png",
+      "description": "Major US airline with extensive domestic and international network",
+      "hub_routes": ["JFK", "ATL", "DTW", "MSP", "SLC", "LAX"],
+      "typical_routes": ["JFK-ATL", "JFK-DTW", "JFK-MSP", "JFK-SLC", "ATL-JFK"]
+    },
+    "B6": {
+      "name": "JetBlue Airways",
+      "logo": "/airline-logos/b6.png",
+      "description": "Low-cost carrier with focus on East Coast and transcontinental routes",
+      "hub_routes": ["JFK", "BOS", "FLL", "MCO", "LGB"],
+      "typical_routes": ["JFK-LAX", "JFK-BOS", "JFK-FLL", "JFK-MCO", "BOS-JFK"]
+    },
+    "WN": {
+      "name": "Southwest Airlines",
+      "logo": "/airline-logos/wn.png",
+      "description": "Low-cost carrier with extensive domestic network",
+      "hub_routes": ["MDW", "BWI", "HOU", "PHX", "LAS"],
+      "typical_routes": ["MDW-BWI", "BWI-HOU", "HOU-PHX", "PHX-LAS", "LAS-MDW"]
+    },
+    "US": {
+      "name": "US Airways",
+      "logo": "/airline-logos/us.png",
+      "description": "Legacy carrier (now part of American Airlines)",
+      "hub_routes": ["PHL", "CLT", "PHX", "PIT"],
+      "typical_routes": ["PHL-CLT", "CLT-PHX", "PHX-PIT", "PIT-PHL"]
+    }
+  },
+  "route_mapping": {
+    "JFK-LAX": {
+      "airlines": ["AA", "DL", "UA", "B6"],
+      "frequencies": {"AA": 0.35, "DL": 0.25, "UA": 0.25, "B6": 0.15}
+    },
+    "LAX-JFK": {
+      "airlines": ["AA", "DL", "UA", "B6"],
+      "frequencies": {"AA": 0.35, "DL": 0.25, "UA": 0.25, "B6": 0.15}
+    },
+    "JFK-SFO": {
+      "airlines": ["AA", "UA", "DL"],
+      "frequencies": {"AA": 0.4, "UA": 0.4, "DL": 0.2}
+    },
+    "SFO-JFK": {
+      "airlines": ["AA", "UA", "DL"],
+      "frequencies": {"AA": 0.4, "UA": 0.4, "DL": 0.2}
+    },
+    "EWR-LAX": {
+      "airlines": ["UA", "AA", "DL"],
+      "frequencies": {"UA": 0.45, "AA": 0.3, "DL": 0.25}
+    },
+    "LAX-EWR": {
+      "airlines": ["UA", "AA", "DL"],
+      "frequencies": {"UA": 0.45, "AA": 0.3, "DL": 0.25}
+    },
+    "LGA-ATL": {
+      "airlines": ["DL", "AA", "WN"],
+      "frequencies": {"DL": 0.6, "AA": 0.3, "WN": 0.1}
+    },
+    "ATL-LGA": {
+      "airlines": ["DL", "AA", "WN"],
+      "frequencies": {"DL": 0.6, "AA": 0.3, "WN": 0.1}
+    },
+    "JFK-BOS": {
+      "airlines": ["AA", "B6", "DL"],
+      "frequencies": {"AA": 0.35, "B6": 0.4, "DL": 0.25}
+    },
+    "BOS-JFK": {
+      "airlines": ["AA", "B6", "DL"],
+      "frequencies": {"AA": 0.35, "B6": 0.4, "DL": 0.25}
+    },
+    "EWR-BOS": {
+      "airlines": ["UA", "B6"],
+      "frequencies": {"UA": 0.6, "B6": 0.4}
+    },
+    "BOS-EWR": {
+      "airlines": ["UA", "B6"],
+      "frequencies": {"UA": 0.6, "B6": 0.4}
+    },
+    "JFK-MIA": {
+      "airlines": ["AA", "DL", "B6"],
+      "frequencies": {"AA": 0.5, "DL": 0.3, "B6": 0.2}
+    },
+    "MIA-JFK": {
+      "airlines": ["AA", "DL", "B6"],
+      "frequencies": {"AA": 0.5, "DL": 0.3, "B6": 0.2}
+    },
+    "LGA-ORD": {
+      "airlines": ["AA", "UA", "DL"],
+      "frequencies": {"AA": 0.4, "UA": 0.4, "DL": 0.2}
+    },
+    "ORD-LGA": {
+      "airlines": ["AA", "UA", "DL"],
+      "frequencies": {"AA": 0.4, "UA": 0.4, "DL": 0.2}
+    },
+    "EWR-ORD": {
+      "airlines": ["UA", "AA"],
+      "frequencies": {"UA": 0.7, "AA": 0.3}
+    },
+    "ORD-EWR": {
+      "airlines": ["UA", "AA"],
+      "frequencies": {"UA": 0.7, "AA": 0.3}
+    },
+    "JFK-DFW": {
+      "airlines": ["AA", "DL"],
+      "frequencies": {"AA": 0.6, "DL": 0.4}
+    },
+    "DFW-JFK": {
+      "airlines": ["AA", "DL"],
+      "frequencies": {"AA": 0.6, "DL": 0.4}
+    },
+    "LGA-DFW": {
+      "airlines": ["AA", "DL"],
+      "frequencies": {"AA": 0.6, "DL": 0.4}
+    },
+    "DFW-LGA": {
+      "airlines": ["AA", "DL"],
+      "frequencies": {"AA": 0.6, "DL": 0.4}
+    },
+    "JFK-MCO": {
+      "airlines": ["AA", "DL", "B6"],
+      "frequencies": {"AA": 0.4, "DL": 0.3, "B6": 0.3}
+    },
+    "MCO-JFK": {
+      "airlines": ["AA", "DL", "B6"],
+      "frequencies": {"AA": 0.4, "DL": 0.3, "B6": 0.3}
+    },
+    "LGA-MCO": {
+      "airlines": ["AA", "DL", "B6"],
+      "frequencies": {"AA": 0.4, "DL": 0.3, "B6": 0.3}
+    },
+    "MCO-LGA": {
+      "airlines": ["AA", "DL", "B6"],
+      "frequencies": {"AA": 0.4, "DL": 0.3, "B6": 0.3}
+    },
+    "JFK-FLL": {
+      "airlines": ["AA", "DL", "B6"],
+      "frequencies": {"AA": 0.35, "DL": 0.25, "B6": 0.4}
+    },
+    "FLL-JFK": {
+      "airlines": ["AA", "DL", "B6"],
+      "frequencies": {"AA": 0.35, "DL": 0.25, "B6": 0.4}
+    },
+    "LGA-FLL": {
+      "airlines": ["AA", "DL", "B6"],
+      "frequencies": {"AA": 0.35, "DL": 0.25, "B6": 0.4}
+    },
+    "FLL-LGA": {
+      "airlines": ["AA", "DL", "B6"],
+      "frequencies": {"AA": 0.35, "DL": 0.25, "B6": 0.4}
+    },
+    "JFK-SJU": {
+      "airlines": ["AA", "DL", "B6"],
+      "frequencies": {"AA": 0.5, "DL": 0.3, "B6": 0.2}
+    },
+    "SJU-JFK": {
+      "airlines": ["AA", "DL", "B6"],
+      "frequencies": {"AA": 0.5, "DL": 0.3, "B6": 0.2}
+    },
+    "LGA-DTW": {
+      "airlines": ["DL", "AA"],
+      "frequencies": {"DL": 0.8, "AA": 0.2}
+    },
+    "DTW-LGA": {
+      "airlines": ["DL", "AA"],
+      "frequencies": {"DL": 0.8, "AA": 0.2}
+    },
+    "JFK-DTW": {
+      "airlines": ["DL", "AA"],
+      "frequencies": {"DL": 0.8, "AA": 0.2}
+    },
+    "DTW-JFK": {
+      "airlines": ["DL", "AA"],
+      "frequencies": {"DL": 0.8, "AA": 0.2}
+    },
+    "LGA-CLT": {
+      "airlines": ["AA", "US"],
+      "frequencies": {"AA": 0.7, "US": 0.3}
+    },
+    "CLT-LGA": {
+      "airlines": ["AA", "US"],
+      "frequencies": {"AA": 0.7, "US": 0.3}
+    },
+    "EWR-CLT": {
+      "airlines": ["UA", "AA", "US"],
+      "frequencies": {"UA": 0.4, "AA": 0.4, "US": 0.2}
+    },
+    "CLT-EWR": {
+      "airlines": ["UA", "AA", "US"],
+      "frequencies": {"UA": 0.4, "AA": 0.4, "US": 0.2}
+    },
+    "LGA-DCA": {
+      "airlines": ["AA", "DL", "UA"],
+      "frequencies": {"AA": 0.4, "DL": 0.3, "UA": 0.3}
+    },
+    "DCA-LGA": {
+      "airlines": ["AA", "DL", "UA"],
+      "frequencies": {"AA": 0.4, "DL": 0.3, "UA": 0.3}
+    },
+    "EWR-IAD": {
+      "airlines": ["UA", "AA"],
+      "frequencies": {"UA": 0.8, "AA": 0.2}
+    },
+    "IAD-EWR": {
+      "airlines": ["UA", "AA"],
+      "frequencies": {"UA": 0.8, "AA": 0.2}
+    },
+    "JFK-PHL": {
+      "airlines": ["AA", "US"],
+      "frequencies": {"AA": 0.6, "US": 0.4}
+    },
+    "PHL-JFK": {
+      "airlines": ["AA", "US"],
+      "frequencies": {"AA": 0.6, "US": 0.4}
+    },
+    "EWR-PHL": {
+      "airlines": ["UA", "AA", "US"],
+      "frequencies": {"UA": 0.5, "AA": 0.3, "US": 0.2}
+    },
+    "PHL-EWR": {
+      "airlines": ["UA", "AA", "US"],
+      "frequencies": {"UA": 0.5, "AA": 0.3, "US": 0.2}
+    },
+    "LGA-PIT": {
+      "airlines": ["US", "AA"],
+      "frequencies": {"US": 0.7, "AA": 0.3}
+    },
+    "PIT-LGA": {
+      "airlines": ["US", "AA"],
+      "frequencies": {"US": 0.7, "AA": 0.3}
+    },
+    "EWR-PIT": {
+      "airlines": ["UA", "US"],
+      "frequencies": {"UA": 0.6, "US": 0.4}
+    },
+    "PIT-EWR": {
+      "airlines": ["UA", "US"],
+      "frequencies": {"UA": 0.6, "US": 0.4}
+    },
+    "LGA-HOU": {
+      "airlines": ["WN", "AA"],
+      "frequencies": {"WN": 0.7, "AA": 0.3}
+    },
+    "HOU-LGA": {
+      "airlines": ["WN", "AA"],
+      "frequencies": {"WN": 0.7, "AA": 0.3}
+    },
+    "EWR-HOU": {
+      "airlines": ["UA", "WN"],
+      "frequencies": {"UA": 0.6, "WN": 0.4}
+    },
+    "HOU-EWR": {
+      "airlines": ["UA", "WN"],
+      "frequencies": {"UA": 0.6, "WN": 0.4}
+    },
+    "EWR-ATL": {
+      "airlines": ["UA", "DL", "AA"],
+      "frequencies": {"UA": 0.5, "DL": 0.3, "AA": 0.2}
+    },
+    "ATL-EWR": {
+      "airlines": ["UA", "DL", "AA"],
+      "frequencies": {"UA": 0.5, "DL": 0.3, "AA": 0.2}
+    },
+    "EWR-SEA": {
+      "airlines": ["UA", "DL"],
+      "frequencies": {"UA": 0.7, "DL": 0.3}
+    },
+    "SEA-EWR": {
+      "airlines": ["UA", "DL"],
+      "frequencies": {"UA": 0.7, "DL": 0.3}
+    },
+    "EWR-SFO": {
+      "airlines": ["UA", "AA", "DL"],
+      "frequencies": {"UA": 0.6, "AA": 0.25, "DL": 0.15}
+    },
+    "SFO-EWR": {
+      "airlines": ["UA", "AA", "DL"],
+      "frequencies": {"UA": 0.6, "AA": 0.25, "DL": 0.15}
+    },
+    "EWR-DEN": {
+      "airlines": ["UA", "DL", "AA"],
+      "frequencies": {"UA": 0.6, "DL": 0.25, "AA": 0.15}
+    },
+    "DEN-EWR": {
+      "airlines": ["UA", "DL", "AA"],
+      "frequencies": {"UA": 0.6, "DL": 0.25, "AA": 0.15}
+    },
+    "EWR-LAS": {
+      "airlines": ["UA", "AA", "DL"],
+      "frequencies": {"UA": 0.5, "AA": 0.3, "DL": 0.2}
+    },
+    "LAS-EWR": {
+      "airlines": ["UA", "AA", "DL"],
+      "frequencies": {"UA": 0.5, "AA": 0.3, "DL": 0.2}
+    },
+    "EWR-PHX": {
+      "airlines": ["UA", "AA", "WN"],
+      "frequencies": {"UA": 0.4, "AA": 0.4, "WN": 0.2}
+    },
+    "PHX-EWR": {
+      "airlines": ["UA", "AA", "WN"],
+      "frequencies": {"UA": 0.4, "AA": 0.4, "WN": 0.2}
+    },
+    "EWR-MCO": {
+      "airlines": ["UA", "AA", "DL"],
+      "frequencies": {"UA": 0.4, "AA": 0.35, "DL": 0.25}
+    },
+    "MCO-EWR": {
+      "airlines": ["UA", "AA", "DL"],
+      "frequencies": {"UA": 0.4, "AA": 0.35, "DL": 0.25}
+    },
+    "EWR-FLL": {
+      "airlines": ["UA", "AA", "B6"],
+      "frequencies": {"UA": 0.4, "AA": 0.35, "B6": 0.25}
+    },
+    "FLL-EWR": {
+      "airlines": ["UA", "AA", "B6"],
+      "frequencies": {"UA": 0.4, "AA": 0.35, "B6": 0.25}
+    },
+    "EWR-PBI": {
+      "airlines": ["UA", "AA", "B6"],
+      "frequencies": {"UA": 0.4, "AA": 0.35, "B6": 0.25}
+    },
+    "PBI-EWR": {
+      "airlines": ["UA", "AA", "B6"],
+      "frequencies": {"UA": 0.4, "AA": 0.35, "B6": 0.25}
+    },
+    "EWR-TPA": {
+      "airlines": ["UA", "AA", "DL"],
+      "frequencies": {"UA": 0.4, "AA": 0.35, "DL": 0.25}
+    },
+    "TPA-EWR": {
+      "airlines": ["UA", "AA", "DL"],
+      "frequencies": {"UA": 0.4, "AA": 0.35, "DL": 0.25}
+    },
+    "EWR-RSW": {
+      "airlines": ["UA", "AA", "DL"],
+      "frequencies": {"UA": 0.4, "AA": 0.35, "DL": 0.25}
+    },
+    "RSW-EWR": {
+      "airlines": ["UA", "AA", "DL"],
+      "frequencies": {"UA": 0.4, "AA": 0.35, "DL": 0.25}
+    },
+    "EWR-SJU": {
+      "airlines": ["UA", "AA", "DL"],
+      "frequencies": {"UA": 0.4, "AA": 0.4, "DL": 0.2}
+    },
+    "SJU-EWR": {
+      "airlines": ["UA", "AA", "DL"],
+      "frequencies": {"UA": 0.4, "AA": 0.4, "DL": 0.2}
+    },
+    "EWR-MSP": {
+      "airlines": ["UA", "DL"],
+      "frequencies": {"UA": 0.4, "DL": 0.6}
+    },
+    "MSP-EWR": {
+      "airlines": ["UA", "DL"],
+      "frequencies": {"UA": 0.4, "DL": 0.6}
+    },
+    "EWR-DTW": {
+      "airlines": ["UA", "DL"],
+      "frequencies": {"UA": 0.4, "DL": 0.6}
+    },
+    "DTW-EWR": {
+      "airlines": ["UA", "DL"],
+      "frequencies": {"UA": 0.4, "DL": 0.6}
+    },
+    "EWR-IAH": {
+      "airlines": ["UA", "AA"],
+      "frequencies": {"UA": 0.6, "AA": 0.4}
+    },
+    "IAH-EWR": {
+      "airlines": ["UA", "AA"],
+      "frequencies": {"UA": 0.6, "AA": 0.4}
+    },
+    "EWR-DFW": {
+      "airlines": ["UA", "AA", "DL"],
+      "frequencies": {"UA": 0.4, "AA": 0.4, "DL": 0.2}
+    },
+    "DFW-EWR": {
+      "airlines": ["UA", "AA", "DL"],
+      "frequencies": {"UA": 0.4, "AA": 0.4, "DL": 0.2}
+    }
+  },
+  "top_routes": [
+    ["JFK-LAX", 1705],
+    ["LGA-ATL", 1558],
+    ["LGA-ORD", 1285],
+    ["JFK-SFO", 1254],
+    ["LGA-CLT", 925],
+    ["EWR-ORD", 913],
+    ["JFK-BOS", 878],
+    ["LGA-MIA", 841],
+    ["EWR-BOS", 810],
+    ["JFK-MCO", 788],
+    ["LGA-DTW", 778],
+    ["LGA-DFW", 760],
+    ["EWR-CLT", 735],
+    ["EWR-MCO", 730],
+    ["EWR-ATL", 706],
+    ["LGA-DCA", 699],
+    ["JFK-SJU", 681],
+    ["JFK-FLL", 671],
+    ["LGA-BOS", 640],
+    ["EWR-SFO", 608]
+  ]
+} 
