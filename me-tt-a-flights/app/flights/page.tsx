@@ -260,7 +260,7 @@ export default function FlightsPage() {
                     <Plane className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
                     <h3 className="text-lg font-semibold mb-2">Ready to search flights</h3>
                     <p className="text-muted-foreground mb-4">
-                      Use the search form above to find flights from our 2013 database.
+                      Use the search form above to find flights from our 2025 database.
                     </p>
                   </div>
                 </CardContent>
