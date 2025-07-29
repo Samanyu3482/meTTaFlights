@@ -139,8 +139,67 @@ export default function HomePage() {
 
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-purple-50 via-white to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+        {/* Background Images Grid */}
+        <div className="absolute inset-0 grid grid-cols-3 grid-rows-2">
+          <div className="relative">
+            <Image
+              src="/destinations/paris.jpg"
+              alt="Paris"
+              fill
+              className="object-cover"
+              style={{ opacity: 0.4 }}
+            />
+          </div>
+          <div className="relative">
+            <Image
+              src="/destinations/tokyo.jpg"
+              alt="Tokyo"
+              fill
+              className="object-cover"
+              style={{ opacity: 0.4 }}
+            />
+          </div>
+          <div className="relative">
+            <Image
+              src="/destinations/london.jpg"
+              alt="London"
+              fill
+              className="object-cover"
+              style={{ opacity: 0.4 }}
+            />
+          </div>
+          <div className="relative">
+            <Image
+              src="/destinations/dubai.jpg"
+              alt="Dubai"
+              fill
+              className="object-cover"
+              style={{ opacity: 0.4 }}
+            />
+          </div>
+          <div className="relative">
+            <Image
+              src="/destinations/barcelona.jpg"
+              alt="Barcelona"
+              fill
+              className="object-cover"
+              style={{ opacity: 0.4 }}
+            />
+          </div>
+          <div className="relative">
+            <Image
+              src="/destinations/singapore.jpg"
+              alt="Singapore"
+              fill
+              className="object-cover"
+              style={{ opacity: 0.4 }}
+            />
+          </div>
+        </div>
+        
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-50/60 via-white/80 to-pink-50/60 dark:from-gray-900/60 dark:via-gray-800/80 dark:to-gray-900/60"></div>
         <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-        <div className="container mx-auto px-4 py-20">
+        <div className="container mx-auto px-4 py-20 relative z-10">
           <div className="text-center mb-12">
             <div className="inline-flex items-center justify-center p-2 bg-primary/10 rounded-full mb-6">
               <Plane className="h-8 w-8 text-primary animate-float" />
