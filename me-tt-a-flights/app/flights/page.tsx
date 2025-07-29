@@ -23,7 +23,7 @@ export default function FlightsPage() {
   const [filteredFlights, setFilteredFlights] = useState<Flight[]>([])
   const [priority, setPriority] = useState<"cost" | "time" | "optimized">("cost")
   const [includeConnections, setIncludeConnections] = useState(true)
-  const [priceRange, setPriceRange] = useState([0, 10000])
+  const [priceRange, setPriceRange] = useState([0, 50000])
   const [selectedSources, setSelectedSources] = useState<string[]>([])
   const [selectedDestinations, setSelectedDestinations] = useState<string[]>([])
   const [showFilters, setShowFilters] = useState(false)
@@ -66,7 +66,7 @@ export default function FlightsPage() {
   useEffect(() => {
     setFilteredFlights(mettaFlights)
     if (mettaFlights.length > 0) {
-      console.log('Updated flights with airline data:', mettaFlights)
+      console.log(`Loaded ${mettaFlights.length} flights`)
     }
   }, [mettaFlights])
 
@@ -93,6 +93,12 @@ export default function FlightsPage() {
     } catch (err) {
       console.error('Search error:', err)
     }
+  }
+
+  const resetFilters = () => {
+    setPriceRange([0, 50000])
+    setSelectedSources([])
+    setSelectedDestinations([])
   }
 
   // Get unique sources and destinations for filters
@@ -196,13 +202,22 @@ export default function FlightsPage() {
                     <Filter className="mr-2 h-4 w-4" />
                     Filters
                   </CardTitle>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setShowFilters(!showFilters)}
-                  >
-                    {showFilters ? "Hide" : "Show"}
-                  </Button>
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={resetFilters}
+                    >
+                      Reset
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowFilters(!showFilters)}
+                    >
+                      {showFilters ? "Hide" : "Show"}
+                    </Button>
+                  </div>
                 </div>
               </CardHeader>
               
@@ -216,7 +231,7 @@ export default function FlightsPage() {
                     <Slider
                       value={priceRange}
                       onValueChange={setPriceRange}
-                      max={10000}
+                      max={50000}
                       min={0}
                       step={100}
                       className="mt-2"
