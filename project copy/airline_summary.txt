@@ -1,0 +1,27 @@
+AIRLINE MAPPING SUMMARY
+==================================================
+
+Total flights analyzed: 49,999
+Unique routes found: 208
+Routes mapped to airlines: 203
+Coverage: 97.6%
+
+TOP 10 ROUTES:
+ 1. JFK-LAX: 1,705 flights (AA)
+ 2. LGA-ATL: 1,558 flights (DL)
+ 3. LGA-ORD: 1,285 flights (AA)
+ 4. JFK-SFO: 1,254 flights (AA)
+ 5. LGA-CLT: 925 flights (AA)
+ 6. EWR-ORD: 913 flights (UA)
+ 7. JFK-BOS: 878 flights (B6)
+ 8. LGA-MIA: 841 flights (AA)
+ 9. EWR-BOS: 810 flights (UA)
+10. JFK-MCO: 788 flights (B6)
+
+AIRLINE BREAKDOWN:
+AA: American Airlines - 103 routes
+UA: United Airlines - 81 routes
+DL: Delta Air Lines - 7 routes
+B6: JetBlue Airways - 7 routes
+WN: Southwest Airlines - 3 routes
+US: US Airways - 2 routes

@@ -1,0 +1,116 @@
+# Complete Airport Codes from flights.metta Database
+# Total: 103 unique airports across 49,999 flight records
+
+ABQ - Albuquerque International Sunport, NM
+ACK - Nantucket Memorial Airport, MA
+ALB - Albany International Airport, NY
+ATL - Hartsfield-Jackson Atlanta International Airport, GA
+AUS - Austin-Bergstrom International Airport, TX
+AVL - Asheville Regional Airport, NC
+BDL - Bradley International Airport, CT
+BGR - Bangor International Airport, ME
+BHM - Birmingham-Shuttlesworth International Airport, AL
+BNA - Nashville International Airport, TN
+BOS - Boston Logan International Airport, MA
+BQN - Rafael Hernandez Airport, Puerto Rico
+BTV - Burlington International Airport, VT
+BUF - Buffalo Niagara International Airport, NY
+BUR - Bob Hope Airport, CA
+BWI - Baltimore/Washington International Airport, MD
+BZN - Bozeman Yellowstone International Airport, MT
+CAE - Columbia Metropolitan Airport, SC
+CAK - Akron-Canton Regional Airport, OH
+CHS - Charleston International Airport, SC
+CLE - Cleveland Hopkins International Airport, OH
+CLT - Charlotte Douglas International Airport, NC
+CMH - John Glenn Columbus International Airport, OH
+CRW - Yeager Airport, WV
+CVG - Cincinnati/Northern Kentucky International Airport, KY
+DAY - Dayton International Airport, OH
+DCA - Ronald Reagan Washington National Airport, DC
+DEN - Denver International Airport, CO
+DFW - Dallas/Fort Worth International Airport, TX
+DSM - Des Moines International Airport, IA
+DTW - Detroit Metropolitan Wayne County Airport, MI
+EGE - Eagle County Regional Airport, CO
+EWR - Newark Liberty International Airport, NJ
+EYW - Key West International Airport, FL
+FLL - Fort Lauderdale-Hollywood International Airport, FL
+GRR - Gerald R. Ford International Airport, MI
+GSO - Piedmont Triad International Airport, NC
+GSP - Greenville-Spartanburg International Airport, SC
+HDN - Yampa Valley Regional Airport, CO
+HNL - Daniel K. Inouye International Airport, HI
+HOU - William P. Hobby Airport, TX
+IAD - Washington Dulles International Airport, DC
+IAH - George Bush Intercontinental Airport, TX
+ILM - Wilmington International Airport, NC
+IND - Indianapolis International Airport, IN
+JAC - Jackson Hole Airport, WY
+JAX - Jacksonville International Airport, FL
+JFK - John F. Kennedy International Airport, NY
+LAS - McCarran International Airport, NV
+LAX - Los Angeles International Airport, CA
+LGA - LaGuardia Airport, NY
+LGB - Long Beach Airport, CA
+MCI - Kansas City International Airport, MO
+MCO - Orlando International Airport, FL
+MDW - Chicago Midway International Airport, IL
+MEM - Memphis International Airport, TN
+MHT - Manchester-Boston Regional Airport, NH
+MIA - Miami International Airport, FL
+MKE - Milwaukee Mitchell International Airport, WI
+MSN - Dane County Regional Airport, WI
+MSP - Minneapolis-Saint Paul International Airport, MN
+MSY - Louis Armstrong New Orleans International Airport, LA
+MTJ - Montrose Regional Airport, CO
+MVY - Martha's Vineyard Airport, MA
+MYR - Myrtle Beach International Airport, SC
+OAK - Oakland International Airport, CA
+OKC - Will Rogers World Airport, OK
+OMA - Eppley Airfield, NE
+ORD - O'Hare International Airport, IL
+ORF - Norfolk International Airport, VA
+PBI - Palm Beach International Airport, FL
+PDX - Portland International Airport, OR
+PHL - Philadelphia International Airport, PA
+PHX - Phoenix Sky Harbor International Airport, AZ
+PIT - Pittsburgh International Airport, PA
+PSE - Mercedita Airport, Puerto Rico
+PSP - Palm Springs International Airport, CA
+PVD - T.F. Green International Airport, RI
+PWM - Portland International Jetport, ME
+RDU - Raleigh-Durham International Airport, NC
+RIC - Richmond International Airport, VA
+ROC - Greater Rochester International Airport, NY
+RSW - Southwest Florida International Airport, FL
+SAN - San Diego International Airport, CA
+SAT - San Antonio International Airport, TX
+SAV - Savannah/Hilton Head International Airport, GA
+SBN - South Bend International Airport, IN
+SDF - Louisville Muhammad Ali International Airport, KY
+SEA - Seattle-Tacoma International Airport, WA
+SFO - San Francisco International Airport, CA
+SJC - Norman Y. Mineta San Jose International Airport, CA
+SJU - Luis Muñoz Marín International Airport, Puerto Rico
+SLC - Salt Lake City International Airport, UT
+SMF - Sacramento International Airport, CA
+SNA - John Wayne Airport, CA
+SRQ - Sarasota-Bradenton International Airport, FL
+STL - St. Louis Lambert International Airport, MO
+STT - Cyril E. King Airport, U.S. Virgin Islands
+SYR - Syracuse Hancock International Airport, NY
+TPA - Tampa International Airport, FL
+TUL - Tulsa International Airport, OK
+TYS - McGhee Tyson Airport, TN
+XNA - Northwest Arkansas National Airport, AR
+
+# Most Popular Airports (by frequency in database):
+# EWR - Newark Liberty International Airport (most flights)
+# JFK - John F. Kennedy International Airport
+# ATL - Hartsfield-Jackson Atlanta International Airport
+# BOS - Boston Logan International Airport
+# SEA - Seattle-Tacoma International Airport
+# BNA - Nashville International Airport
+# AUS - Austin-Bergstrom International Airport
+# BDL - Bradley International Airport 

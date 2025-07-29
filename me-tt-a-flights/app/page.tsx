@@ -7,35 +7,64 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Star, MapPin, Clock, Shield, Award, Plane, Globe } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 
 const featuredDestinations = [
   {
     city: "Paris",
     country: "France",
     price: "from $599",
-    image: "/placeholder.svg?height=200&width=300",
+    image: "/destinations/paris.jpg",
     description: "City of Light and Romance",
   },
   {
     city: "Tokyo",
     country: "Japan",
     price: "from $899",
-    image: "/placeholder.svg?height=200&width=300",
+    image: "/destinations/tokyo.jpg",
     description: "Modern metropolis meets tradition",
   },
   {
     city: "New York",
     country: "USA",
     price: "from $399",
-    image: "/placeholder.svg?height=200&width=300",
+    image: "/destinations/newyork.jpg",
     description: "The city that never sleeps",
   },
   {
     city: "London",
     country: "UK",
     price: "from $549",
-    image: "/placeholder.svg?height=200&width=300",
+    image: "/destinations/london.jpg",
     description: "Historic charm and modern culture",
+  },
+  {
+    city: "Rome",
+    country: "Italy",
+    price: "from $699",
+    image: "/destinations/rome.jpg",
+    description: "Eternal city of history and culture",
+  },
+  {
+    city: "Barcelona",
+    country: "Spain",
+    price: "from $649",
+    image: "/destinations/barcelona.jpg",
+    description: "Mediterranean charm and architecture",
+  },
+  {
+    city: "Dubai",
+    country: "UAE",
+    price: "from $799",
+    image: "/destinations/dubai.jpg",
+    description: "Luxury and futuristic architecture",
+  },
+  {
+    city: "Singapore",
+    country: "Singapore",
+    price: "from $749",
+    image: "/destinations/singapore.jpg",
+    description: "Garden city of innovation",
   },
 ]
 
@@ -44,19 +73,31 @@ const testimonials = [
     name: "Sarah Johnson",
     rating: 5,
     comment: "Amazing service! Found the perfect flight at an unbeatable price. The booking process was seamless.",
-    avatar: "/placeholder.svg?height=40&width=40",
+    avatar: "/testimonials/sarah.jpg",
   },
   {
     name: "Michael Chen",
     rating: 5,
     comment: "Best flight booking experience ever. Great customer support and easy cancellation policy.",
-    avatar: "/placeholder.svg?height=40&width=40",
+    avatar: "/testimonials/michael.jpg",
   },
   {
     name: "Emma Davis",
     rating: 5,
     comment: "Love the user interface and how easy it is to compare different airlines. Highly recommended!",
-    avatar: "/placeholder.svg?height=40&width=40",
+    avatar: "/testimonials/emma.jpg",
+  },
+  {
+    name: "David Rodriguez",
+    rating: 5,
+    comment: "Incredible deals and the search filters are so helpful. Found exactly what I was looking for!",
+    avatar: "/testimonials/david.jpg",
+  },
+  {
+    name: "Lisa Thompson",
+    rating: 5,
+    comment: "The mobile app is fantastic! Booked my entire trip in minutes. Customer service is top-notch.",
+    avatar: "/testimonials/lisa.jpg",
   },
 ]
 
@@ -209,10 +250,12 @@ export default function HomePage() {
                 className="overflow-hidden hover:shadow-lg transition-all duration-300 group cursor-pointer hover:scale-105"
               >
                 <div className="relative h-48 overflow-hidden">
-                  <img
+                  <Image
                     src={destination.image || "/placeholder.svg"}
                     alt={destination.city}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                    fill
+                    className="object-cover group-hover:scale-110 transition-transform duration-300"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   />
                   <div className="absolute top-4 right-4">
                     <Badge className="bg-white/90 text-black">{destination.price}</Badge>
@@ -248,15 +291,17 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
               <Card key={index} className="hover:shadow-lg transition-all duration-300 hover:scale-105">
                 <CardContent className="p-6">
                   <div className="flex items-center mb-4">
-                    <img
+                    <Image
                       src={testimonial.avatar || "/placeholder.svg"}
                       alt={testimonial.name}
-                      className="w-12 h-12 rounded-full mr-4"
+                      width={48}
+                      height={48}
+                      className="rounded-full mr-4 object-cover"
                     />
                     <div>
                       <h4 className="font-semibold">{testimonial.name}</h4>
