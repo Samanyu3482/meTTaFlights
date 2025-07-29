@@ -58,7 +58,16 @@ export default function RegisterPage() {
         title: "Account created!",
         description: "Welcome to meTTaFlights. Your account has been created successfully.",
       })
-      router.push("/")
+      
+      // Check if there's a pending booking
+      const selectedFlight = localStorage.getItem('selectedFlight')
+      if (selectedFlight) {
+        // If there's a selected flight, redirect to booking page
+        router.push('/booking/new')
+      } else {
+        // Otherwise redirect to home page
+        router.push("/")
+      }
     } catch (error) {
       toast({
         title: "Registration failed",
