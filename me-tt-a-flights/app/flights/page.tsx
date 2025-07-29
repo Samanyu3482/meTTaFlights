@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useSearchParams } from "next/navigation"
+import { useSearchParams, useRouter } from "next/navigation"
 import { Navigation } from "@/components/navigation"
 import { FlightSearch } from "@/components/flight-search"
 import { Button } from "@/components/ui/button"
@@ -14,12 +14,17 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Plane, Filter, Calendar, MapPin, DollarSign, Star, Heart, Loader2, ArrowLeftRight, Clock, Zap } from "lucide-react"
 import { useFlightSearch } from "@/hooks/use-flight-search"
+import { useAuth } from "@/components/auth-provider"
+import { useToast } from "@/hooks/use-toast"
 import { Flight } from "@/lib/api"
 import { getAirportLocation } from "@/lib/airports"
 
 export default function FlightsPage() {
   const searchParams = useSearchParams()
+  const router = useRouter()
   const { flights: mettaFlights, loading, error, getAllFlights, searchFlights } = useFlightSearch()
+  const { user } = useAuth()
+  const { toast } = useToast()
   const [filteredFlights, setFilteredFlights] = useState<Flight[]>([])
   const [priority, setPriority] = useState<"cost" | "time" | "optimized">("cost")
   const [includeConnections, setIncludeConnections] = useState(true)
@@ -101,6 +106,23 @@ export default function FlightsPage() {
     setSelectedDestinations([])
   }
 
+  const handleBookNow = (flight: Flight) => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please log in to book a flight.",
+        variant: "destructive",
+      })
+      router.push('/login')
+      return
+    }
+    
+    // Store flight data in localStorage for the booking page
+    localStorage.setItem('selectedFlight', JSON.stringify(flight))
+    // Navigate to booking page
+    router.push('/booking/new')
+  }
+
   // Get unique sources and destinations for filters
   const uniqueSources = [...new Set(mettaFlights.map(f => f.source))].sort()
   const uniqueDestinations = [...new Set(mettaFlights.map(f => f.destination))].sort()
@@ -156,6 +178,30 @@ export default function FlightsPage() {
       <Navigation />
 
       <div className="container mx-auto px-4 py-8">
+        {/* Authentication Notice */}
+        {!user && (
+          <Card className="mb-6 border-blue-200 bg-blue-50">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Plane className="h-5 w-5 text-blue-600" />
+                  <div>
+                    <p className="font-medium text-blue-900">Login to Book Flights</p>
+                    <p className="text-sm text-blue-700">Sign in to your account to book flights and save your preferences.</p>
+                  </div>
+                </div>
+                <Button 
+                  size="sm" 
+                  onClick={() => router.push('/login')}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  Sign In
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Search Section */}
         <div className="mb-8">
           <FlightSearch 
@@ -422,9 +468,14 @@ export default function FlightsPage() {
 
                         {/* Action Buttons */}
                         <div className="flex flex-col space-y-2 ml-4">
-                          <Button size="sm">
+                          <Button 
+                            size="sm" 
+                            onClick={() => handleBookNow(flight)}
+                            variant={user ? "default" : "secondary"}
+                            className={user ? "" : "border-dashed"}
+                          >
                             <DollarSign className="h-4 w-4 mr-1" />
-                            Book Now
+                            {user ? "Book Now" : "Login to Book"}
                           </Button>
                           <Button variant="outline" size="sm">
                             <Heart className="h-4 w-4 mr-1" />

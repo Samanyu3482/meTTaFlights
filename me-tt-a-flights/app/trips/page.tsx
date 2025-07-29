@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Navigation } from "@/components/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -8,89 +8,63 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { useAuth } from "@/components/auth-provider"
-import { Plane, Calendar, MapPin, Clock, Download, Share, AlertCircle, CheckCircle, XCircle } from "lucide-react"
+import { bookingsService, Booking } from "@/lib/bookings"
+import { Plane, Calendar, MapPin, Clock, Download, Share, AlertCircle, CheckCircle, XCircle, Trash2, Settings } from "lucide-react"
 import Link from "next/link"
-
-interface Trip {
-  id: string
-  bookingRef: string
-  status: "confirmed" | "cancelled" | "completed"
-  departure: {
-    airport: string
-    city: string
-    time: string
-    date: string
-  }
-  arrival: {
-    airport: string
-    city: string
-    time: string
-    date: string
-  }
-  airline: string
-  flightNumber: string
-  duration: string
-  seat: string
-  class: string
-  price: number
-  passengers: string[]
-}
-
-const mockTrips: Trip[] = [
-  {
-    id: "1",
-    bookingRef: "ABC123DEF",
-    status: "confirmed",
-    departure: {
-      airport: "JFK",
-      city: "New York",
-      time: "08:30",
-      date: "2024-03-15",
-    },
-    arrival: {
-      airport: "LAX",
-      city: "Los Angeles",
-      time: "11:45",
-      date: "2024-03-15",
-    },
-    airline: "Delta Airlines",
-    flightNumber: "DL 1234",
-    duration: "6h 15m",
-    seat: "12A",
-    class: "Economy",
-    price: 299,
-    passengers: ["John Doe"],
-  },
-  {
-    id: "2",
-    bookingRef: "XYZ789GHI",
-    status: "completed",
-    departure: {
-      airport: "LAX",
-      city: "Los Angeles",
-      time: "14:20",
-      date: "2024-02-10",
-    },
-    arrival: {
-      airport: "LHR",
-      city: "London",
-      time: "09:35",
-      date: "2024-02-11",
-    },
-    airline: "British Airways",
-    flightNumber: "BA 269",
-    duration: "11h 15m",
-    seat: "8C",
-    class: "Premium Economy",
-    price: 899,
-    passengers: ["John Doe"],
-  },
-]
+import { useRouter } from "next/navigation"
+import { useToast } from "@/hooks/use-toast"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 export default function TripsPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [activeTab, setActiveTab] = useState("upcoming")
+  const [bookings, setBookings] = useState<Booking[]>([])
+  const [loading, setLoading] = useState(true)
   const { user } = useAuth()
+  const router = useRouter()
+  const { toast } = useToast()
+
+  // Load user bookings
+  useEffect(() => {
+    if (user) {
+      const userBookings = bookingsService.getUserBookings(user.id)
+      setBookings(userBookings)
+    }
+    setLoading(false)
+  }, [user])
+
+  // Refresh bookings when component mounts (useful after booking completion)
+  useEffect(() => {
+    const refreshBookings = () => {
+      if (user) {
+        const userBookings = bookingsService.getUserBookings(user.id)
+        setBookings(userBookings)
+      }
+    }
+
+    // Refresh on mount
+    refreshBookings()
+
+    // Listen for storage changes (in case bookings are added from another tab)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'userBookings') {
+        refreshBookings()
+      }
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+    return () => window.removeEventListener('storage', handleStorageChange)
+  }, [user])
 
   if (!user) {
     return (
@@ -138,18 +112,40 @@ export default function TripsPage() {
     }
   }
 
-  const filteredTrips = mockTrips.filter((trip) => {
+  const handleRemoveBooking = async (bookingId: string) => {
+    try {
+      bookingsService.deleteBooking(bookingId)
+      setBookings(bookings.filter(booking => booking.id !== bookingId))
+      toast({
+        title: "Booking removed",
+        description: "Your booking has been removed successfully.",
+      })
+    } catch (error) {
+      toast({
+        title: "Error removing booking",
+        description: "Failed to remove booking. Please try again.",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleManageBooking = (bookingId: string) => {
+    router.push(`/booking/manage/${bookingId}`)
+  }
+
+  const filteredTrips = bookings.filter((booking) => {
     const matchesSearch =
-      trip.bookingRef.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      trip.departure.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      trip.arrival.city.toLowerCase().includes(searchTerm.toLowerCase())
+      booking.bookingRef.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      booking.flight.source.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      booking.flight.destination.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      booking.flight.airline?.name.toLowerCase().includes(searchTerm.toLowerCase())
 
     if (activeTab === "upcoming") {
-      return matchesSearch && trip.status === "confirmed"
+      return matchesSearch && booking.status === "confirmed"
     } else if (activeTab === "completed") {
-      return matchesSearch && trip.status === "completed"
+      return matchesSearch && booking.status === "completed"
     } else {
-      return matchesSearch && trip.status === "cancelled"
+      return matchesSearch && booking.status === "cancelled"
     }
   })
 
@@ -185,7 +181,15 @@ export default function TripsPage() {
           </TabsList>
 
           <TabsContent value={activeTab} className="mt-6">
-            {filteredTrips.length === 0 ? (
+            {loading ? (
+              <Card className="text-center py-12">
+                <CardContent>
+                  <Plane className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+                  <h3 className="text-xl font-semibold mb-2">Loading trips...</h3>
+                  <p className="text-muted-foreground mb-6">Please wait while we fetch your bookings.</p>
+                </CardContent>
+              </Card>
+            ) : filteredTrips.length === 0 ? (
               <Card className="text-center py-12">
                 <CardContent>
                   <Plane className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
@@ -204,113 +208,167 @@ export default function TripsPage() {
               </Card>
             ) : (
               <div className="space-y-6">
-                {filteredTrips.map((trip) => (
-                  <Card key={trip.id} className="hover:shadow-lg transition-shadow">
-                    <CardHeader>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <div className="flex items-center space-x-2">
-                            {getStatusIcon(trip.status)}
-                            <Badge className={getStatusColor(trip.status)}>
-                              {trip.status.charAt(0).toUpperCase() + trip.status.slice(1)}
-                            </Badge>
-                          </div>
-                          <div>
-                            <CardTitle className="text-lg">{trip.airline}</CardTitle>
-                            <p className="text-sm text-muted-foreground">Booking Ref: {trip.bookingRef}</p>
-                          </div>
-                        </div>
-                        <div className="flex space-x-2">
-                          <Button variant="outline" size="sm">
-                            <Download className="h-4 w-4 mr-1" />
-                            Download
-                          </Button>
-                          <Button variant="outline" size="sm">
-                            <Share className="h-4 w-4 mr-1" />
-                            Share
-                          </Button>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {/* Flight Route */}
-                        <div className="md:col-span-2">
-                          <div className="flex items-center justify-between mb-4">
-                            <div className="text-center">
-                              <p className="text-2xl font-bold">{trip.departure.time}</p>
-                              <p className="text-sm font-medium">{trip.departure.airport}</p>
-                              <p className="text-xs text-muted-foreground">{trip.departure.city}</p>
-                            </div>
+                {filteredTrips.map((booking) => {
+                  const formatTime = (time: string) => {
+                    const hour = time.slice(0, 2)
+                    const minute = time.slice(2, 4)
+                    return `${hour}:${minute}`
+                  }
 
-                            <div className="flex-1 mx-4">
-                              <div className="flex items-center justify-center space-x-2">
-                                <div className="flex-1 h-px bg-border"></div>
-                                <div className="text-center">
-                                  <Plane className="h-4 w-4 text-muted-foreground mx-auto mb-1" />
-                                  <p className="text-xs text-muted-foreground">{trip.duration}</p>
-                                  <p className="text-xs font-medium">{trip.flightNumber}</p>
+                  const formatDuration = (minutes: number) => {
+                    const hours = Math.floor(minutes / 60)
+                    const mins = minutes % 60
+                    return `${hours}h ${mins}m`
+                  }
+
+                  const formatDate = (year: string, month: string, day: string) => {
+                    const paddedMonth = month.padStart(2, '0')
+                    const paddedDay = day.padStart(2, '0')
+                    const date = new Date(`${year}-${paddedMonth}-${paddedDay}`)
+                    return date.toLocaleDateString()
+                  }
+
+                  return (
+                    <Card key={booking.id} className="hover:shadow-lg transition-shadow">
+                      <CardHeader>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-3">
+                            <div className="flex items-center space-x-2">
+                              {getStatusIcon(booking.status)}
+                              <Badge className={getStatusColor(booking.status)}>
+                                {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+                              </Badge>
+                            </div>
+                            <div>
+                              <CardTitle className="text-lg">{booking.flight.airline?.name || 'Flight'}</CardTitle>
+                              <p className="text-sm text-muted-foreground">Booking Ref: {booking.bookingRef}</p>
+                            </div>
+                          </div>
+                          <div className="flex space-x-2">
+                            <Button variant="outline" size="sm">
+                              <Download className="h-4 w-4 mr-1" />
+                              Download
+                            </Button>
+                            <Button variant="outline" size="sm">
+                              <Share className="h-4 w-4 mr-1" />
+                              Share
+                            </Button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button variant="outline" size="sm">
+                                  <Trash2 className="h-4 w-4 mr-1" />
+                                  Remove
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Remove Booking</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Are you sure you want to remove this booking? This action cannot be undone.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction 
+                                    onClick={() => handleRemoveBooking(booking.id)}
+                                    className="bg-red-600 hover:bg-red-700"
+                                  >
+                                    Remove
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                          {/* Flight Route */}
+                          <div className="md:col-span-2">
+                            <div className="flex items-center justify-between mb-4">
+                              <div className="text-center">
+                                <p className="text-2xl font-bold">{formatTime(booking.flight.takeoff)}</p>
+                                <p className="text-sm font-medium">{booking.flight.source}</p>
+                                <p className="text-xs text-muted-foreground">Departure</p>
+                              </div>
+
+                              <div className="flex-1 mx-4">
+                                <div className="flex items-center justify-center space-x-2">
+                                  <div className="flex-1 h-px bg-border"></div>
+                                  <div className="text-center">
+                                    <Plane className="h-4 w-4 text-muted-foreground mx-auto mb-1" />
+                                    <p className="text-xs text-muted-foreground">{formatDuration(booking.flight.duration)}</p>
+                                    {booking.flight.is_connecting && (
+                                      <p className="text-xs font-medium">Via {booking.flight.connection_airport}</p>
+                                    )}
+                                  </div>
+                                  <div className="flex-1 h-px bg-border"></div>
                                 </div>
-                                <div className="flex-1 h-px bg-border"></div>
+                              </div>
+
+                              <div className="text-center">
+                                <p className="text-2xl font-bold">{formatTime(booking.flight.landing)}</p>
+                                <p className="text-sm font-medium">{booking.flight.destination}</p>
+                                <p className="text-xs text-muted-foreground">Arrival</p>
                               </div>
                             </div>
 
-                            <div className="text-center">
-                              <p className="text-2xl font-bold">{trip.arrival.time}</p>
-                              <p className="text-sm font-medium">{trip.arrival.airport}</p>
-                              <p className="text-xs text-muted-foreground">{trip.arrival.city}</p>
+                            <div className="flex items-center justify-center space-x-4 text-sm text-muted-foreground">
+                              <div className="flex items-center">
+                                <Calendar className="h-4 w-4 mr-1" />
+                                {formatDate(booking.flight.year, booking.flight.month, booking.flight.day)}
+                              </div>
+                              <div className="flex items-center">
+                                <MapPin className="h-4 w-4 mr-1" />
+                                {booking.passengerCount} Passenger{booking.passengerCount > 1 ? 's' : ''}
+                              </div>
+                              <div className="flex items-center">
+                                <Clock className="h-4 w-4 mr-1" />
+                                Economy
+                              </div>
                             </div>
                           </div>
 
-                          <div className="flex items-center justify-center space-x-4 text-sm text-muted-foreground">
-                            <div className="flex items-center">
-                              <Calendar className="h-4 w-4 mr-1" />
-                              {new Date(trip.departure.date).toLocaleDateString()}
+                          {/* Trip Details */}
+                          <div className="space-y-4">
+                            <div>
+                              <p className="text-sm text-muted-foreground">Total Price</p>
+                              <p className="text-2xl font-bold text-primary">${booking.totalCost.toLocaleString()}</p>
                             </div>
-                            <div className="flex items-center">
-                              <MapPin className="h-4 w-4 mr-1" />
-                              Seat {trip.seat}
+
+                            <div>
+                              <p className="text-sm text-muted-foreground">Passengers</p>
+                              <div className="space-y-1">
+                                {booking.passengers.map((passenger, index) => (
+                                  <p key={index} className="text-sm font-medium">
+                                    {passenger.firstName} {passenger.lastName}
+                                  </p>
+                                ))}
+                              </div>
                             </div>
-                            <div className="flex items-center">
-                              <Clock className="h-4 w-4 mr-1" />
-                              {trip.class}
-                            </div>
+
+                            {booking.status === "confirmed" && (
+                              <div className="space-y-2">
+                                <Button variant="outline" className="w-full bg-transparent" size="sm">
+                                  Check-in Online
+                                </Button>
+                                <Button 
+                                  variant="outline" 
+                                  className="w-full bg-transparent" 
+                                  size="sm"
+                                  onClick={() => handleManageBooking(booking.id)}
+                                >
+                                  <Settings className="h-4 w-4 mr-1" />
+                                  Manage Booking
+                                </Button>
+                              </div>
+                            )}
                           </div>
                         </div>
-
-                        {/* Trip Details */}
-                        <div className="space-y-4">
-                          <div>
-                            <p className="text-sm text-muted-foreground">Total Price</p>
-                            <p className="text-2xl font-bold text-primary">${trip.price}</p>
-                          </div>
-
-                          <div>
-                            <p className="text-sm text-muted-foreground">Passengers</p>
-                            <div className="space-y-1">
-                              {trip.passengers.map((passenger, index) => (
-                                <p key={index} className="text-sm font-medium">
-                                  {passenger}
-                                </p>
-                              ))}
-                            </div>
-                          </div>
-
-                          {trip.status === "confirmed" && (
-                            <div className="space-y-2">
-                              <Button variant="outline" className="w-full bg-transparent" size="sm">
-                                Check-in Online
-                              </Button>
-                              <Button variant="outline" className="w-full bg-transparent" size="sm">
-                                Manage Booking
-                              </Button>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                      </CardContent>
+                    </Card>
+                  )
+                })}
               </div>
             )}
           </TabsContent>

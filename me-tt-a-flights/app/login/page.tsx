@@ -34,7 +34,16 @@ export default function LoginPage() {
         title: "Welcome back!",
         description: "You have been successfully logged in.",
       })
-      router.push("/")
+      
+      // Check if there's a pending booking
+      const selectedFlight = localStorage.getItem('selectedFlight')
+      if (selectedFlight) {
+        // If there's a selected flight, redirect to booking page
+        router.push('/booking/new')
+      } else {
+        // Otherwise redirect to home page
+        router.push("/")
+      }
     } catch (error) {
       toast({
         title: "Login failed",
