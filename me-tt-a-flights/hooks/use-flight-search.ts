@@ -13,21 +13,44 @@ export function useFlightSearch() {
     setError(null);
     
     try {
-      const results = await apiService.searchFlights(params);
+      // If no date is provided but we're searching for connecting flights, use today's date
+      let searchParams = { ...params };
+      if (!searchParams.year && !searchParams.month && !searchParams.day && searchParams.include_connections) {
+        const today = new Date();
+        searchParams = {
+          ...searchParams,
+          year: today.getFullYear(),
+          month: today.getMonth() + 1,
+          day: today.getDate(),
+        };
+        console.log('No date provided, using today\'s date for connecting flights:', searchParams);
+      }
+      
+      const results = await apiService.searchFlights(searchParams);
       setFlights(results);
       
       if (results.length === 0) {
-        toast({
-          title: "No flights found",
-          description: "Try adjusting your search criteria.",
-          variant: "destructive",
-        });
+        // Provide more specific feedback for connecting flights
+        if (searchParams.include_connections && searchParams.source && searchParams.destination) {
+          toast({
+            title: "No connecting flights found",
+            description: "Try selecting a specific date or check if direct flights are available.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "No flights found",
+            description: "Try adjusting your search criteria or selecting a date.",
+            variant: "destructive",
+          });
+        }
       } else {
-        const priorityText = params.priority === "cost" ? "lowest cost" : 
-                           params.priority === "time" ? "shortest duration" : "optimized";
+        const priorityText = searchParams.priority === "cost" ? "lowest cost" : 
+                           searchParams.priority === "time" ? "shortest duration" : "optimized";
+        const connectionText = searchParams.include_connections ? " (including connections)" : "";
         toast({
           title: `${results.length} flights found`,
-          description: `Results sorted by ${priorityText}.`,
+          description: `Results sorted by ${priorityText}${connectionText}.`,
         });
       }
     } catch (err) {
