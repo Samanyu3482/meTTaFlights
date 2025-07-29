@@ -3,56 +3,86 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { AnimatedCounter } from "@/components/animated-counter"
-import { Plane, Heart, Target, Eye, Zap } from "lucide-react"
+import { Plane, Heart, Target, Eye, Zap, Database, Cpu, Globe, Users, GraduationCap, User, BookOpen, Code } from "lucide-react"
 import Link from "next/link"
 
 const teamMembers = [
   {
-    name: "Sarah Johnson",
-    role: "CEO & Founder",
-    image: "/placeholder.svg?height=200&width=200",
-    bio: "Former airline executive with 15+ years in aviation industry",
+    name: "Samanyu Gautam",
+    role: "Lead Developer & AI Engineer",
+    icon: User,
+    bio: "CSE-AI Student at Chitkara University, specializing in MeTTa and AI technologies",
   },
   {
-    name: "Michael Chen",
-    role: "CTO",
-    image: "/placeholder.svg?height=200&width=200",
-    bio: "Tech visionary specializing in travel technology and AI",
+    name: "Dr. Sushil Narang",
+    role: "Dean & Project Guide",
+    icon: User,
+    bio: "Dean of Engineering at Chitkara University, providing academic guidance",
   },
   {
-    name: "Emma Davis",
-    role: "Head of Operations",
-    image: "/placeholder.svg?height=200&width=200",
-    bio: "Operations expert ensuring seamless customer experiences",
+    name: "Dr. Vandana Mohindru Sood",
+    role: "Faculty Mentor",
+    icon: User,
+    bio: "Faculty mentor providing technical and academic support for the project",
   },
   {
-    name: "David Wilson",
-    role: "Head of Customer Success",
-    image: "/placeholder.svg?height=200&width=200",
-    bio: "Customer advocate with passion for exceptional service",
+    name: "Krubl Sir",
+    role: "Technical Advisor",
+    icon: User,
+    bio: "Singularity Net MeTTa expert, guiding MeTTa integration and knowledge representation",
   },
 ]
 
 const values = [
   {
     icon: Heart,
-    title: "Customer First",
-    description: "Every decision we make puts our customers at the center",
+    title: "Innovation First",
+    description: "Pioneering AI and MeTTa technology in travel industry",
   },
   {
     icon: Target,
-    title: "Innovation",
-    description: "Constantly improving and innovating to serve you better",
+    title: "Academic Excellence",
+    description: "Demonstrating practical application of advanced AI concepts",
   },
   {
     icon: Eye,
-    title: "Transparency",
-    description: "Clear pricing, honest communication, no hidden fees",
+    title: "User-Centric Design",
+    description: "Creating intuitive and accessible flight booking experiences",
   },
   {
     icon: Zap,
-    title: "Efficiency",
-    description: "Making flight booking fast, simple, and hassle-free",
+    title: "Performance",
+    description: "Lightning-fast search across 75K+ flights with AI optimization",
+  },
+]
+
+const techStats = [
+  {
+    icon: Database,
+    title: "Flight Records",
+    value: 75654,
+    suffix: "+",
+    description: "Comprehensive flight database"
+  },
+  {
+    icon: Globe,
+    title: "Airports",
+    value: 103,
+    description: "US domestic airports covered"
+  },
+  {
+    icon: Cpu,
+    title: "API Response",
+    value: 500,
+    suffix: "ms",
+    description: "Average search time"
+  },
+  {
+    icon: Users,
+    title: "Concurrent Users",
+    value: 1000,
+    suffix: "+",
+    description: "System capacity"
   },
 ]
 
@@ -69,48 +99,35 @@ export default function AboutPage() {
               <Plane className="h-8 w-8 text-primary" />
             </div>
             <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              About meTTaFlights
+              About MeTTa-Flights
             </h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              We're on a mission to make travel accessible, affordable, and amazing for everyone. Since 2020, we've been
-              connecting travelers with their dream destinations.
+              An AI-powered flight booking system developed by Samanyu Gautam (CSE-AI, Chitkara University) 
+              under the guidance of Dr. Sushil Narang, Dr. Vandana Mohindru Sood, and Krubl Sir from Singularity Net MeTTa.
             </p>
+            <div className="mt-6">
+              <Badge variant="secondary" className="text-sm">
+                Academic Project 2024-2025
+              </Badge>
+            </div>
           </div>
 
           {/* Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
-            <Card className="text-center">
-              <CardContent className="p-6">
-                <div className="text-3xl font-bold text-primary mb-2">
-                  <AnimatedCounter end={4} />
-                </div>
-                <p className="text-muted-foreground">Years of Excellence</p>
-              </CardContent>
-            </Card>
-            <Card className="text-center">
-              <CardContent className="p-6">
-                <div className="text-3xl font-bold text-primary mb-2">
-                  <AnimatedCounter end={2000000} suffix="+" />
-                </div>
-                <p className="text-muted-foreground">Happy Travelers</p>
-              </CardContent>
-            </Card>
-            <Card className="text-center">
-              <CardContent className="p-6">
-                <div className="text-3xl font-bold text-primary mb-2">
-                  <AnimatedCounter end={500} suffix="+" />
-                </div>
-                <p className="text-muted-foreground">Partner Airlines</p>
-              </CardContent>
-            </Card>
-            <Card className="text-center">
-              <CardContent className="p-6">
-                <div className="text-3xl font-bold text-primary mb-2">
-                  <AnimatedCounter end={195} />
-                </div>
-                <p className="text-muted-foreground">Countries Served</p>
-              </CardContent>
-            </Card>
+            {techStats.map((stat, index) => (
+              <Card key={index} className="text-center">
+                <CardContent className="p-6">
+                  <div className="flex justify-center mb-3">
+                    <stat.icon className="h-8 w-8 text-primary" />
+                  </div>
+                  <div className="text-3xl font-bold text-primary mb-2">
+                    <AnimatedCounter end={stat.value} suffix={stat.suffix || ""} />
+                  </div>
+                  <p className="text-sm font-medium mb-1">{stat.title}</p>
+                  <p className="text-xs text-muted-foreground">{stat.description}</p>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
@@ -120,26 +137,31 @@ export default function AboutPage() {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-6">Our Story</h2>
+              <h2 className="text-3xl md:text-4xl font-bold mb-6">Project Story</h2>
               <div className="space-y-4 text-muted-foreground">
                 <p>
-                  meTTaFlights was born from a simple frustration: booking flights was too complicated, expensive, and
-                  time-consuming. Our founders, experienced travelers themselves, knew there had to be a better way.
+                  MeTTa-Flights is an innovative academic project that demonstrates the practical application of 
+                  cutting-edge AI technologies in the travel industry. Developed as part of the Computer Science 
+                  Engineering - Artificial Intelligence program at Chitkara University, Punjab, India.
                 </p>
                 <p>
-                  In 2020, we set out to revolutionize flight booking by creating a platform that combines cutting-edge
-                  technology with genuine care for our customers. We believe that everyone deserves access to affordable
-                  travel options without the hassle.
+                  The project showcases the integration of MeTTa (Meta Type Theory) knowledge representation system 
+                  with modern web technologies to create a comprehensive flight booking platform. With 75,654 flight 
+                  records and 103 airports, it represents one of the largest academic implementations of MeTTa technology.
                 </p>
                 <p>
-                  Today, we're proud to serve millions of travelers worldwide, helping them discover new destinations
-                  and create unforgettable memories. Our journey is just beginning, and we're excited to have you along
-                  for the ride.
+                  Under the guidance of Dr. Sushil Narang (Dean), Dr. Vandana Mohindru Sood (Faculty Mentor), and 
+                  Krubl Sir from Singularity Net MeTTa, this project demonstrates how academic learning can be 
+                  translated into practical, real-world applications that benefit society.
                 </p>
               </div>
             </div>
             <div className="relative">
-              <img src="/placeholder.svg?height=400&width=600" alt="Our Story" className="rounded-lg shadow-lg" />
+              <img 
+                src="/chitkara/chitkara-university-logo.png" 
+                alt="Chitkara University Logo" 
+                className="rounded-lg shadow-lg w-full h-auto max-w-md mx-auto"
+              />
             </div>
           </div>
         </div>
@@ -177,9 +199,9 @@ export default function AboutPage() {
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Meet Our Team</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Project Contributors</h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              The passionate people behind meTTaFlights, working hard to make your travel dreams come true.
+              The dedicated team behind MeTTa-Flights, combining academic excellence with technical innovation.
             </p>
           </div>
 
@@ -187,11 +209,9 @@ export default function AboutPage() {
             {teamMembers.map((member, index) => (
               <Card key={index} className="text-center hover:shadow-lg transition-all duration-300 hover:scale-105">
                 <CardContent className="p-6">
-                  <img
-                    src={member.image || "/placeholder.svg"}
-                    alt={member.name}
-                    className="w-24 h-24 rounded-full mx-auto mb-4 object-cover"
-                  />
+                  <div className="mx-auto w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                    <member.icon className="h-12 w-12 text-primary" />
+                  </div>
                   <h3 className="text-xl font-semibold mb-2">{member.name}</h3>
                   <Badge variant="secondary" className="mb-3">
                     {member.role}
@@ -207,12 +227,12 @@ export default function AboutPage() {
       {/* CTA */}
       <section className="py-20 flight-gradient text-white">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Join Our Journey?</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Experience the Future of Flight Booking</h2>
           <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
-            Experience the meTTaFlights difference and discover why millions of travelers trust us.
+            Discover how AI and MeTTa technology are revolutionizing the travel industry through this innovative academic project.
           </p>
           <Button size="lg" variant="secondary" asChild className="hover:scale-105 transition-transform">
-            <Link href="/register">Start Your Adventure</Link>
+            <Link href="/flights">Start Exploring</Link>
           </Button>
         </div>
       </section>
