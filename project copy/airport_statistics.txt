@@ -1,0 +1,68 @@
+# Airport Statistics from flights.metta Database
+# Generated from 49,999 flight records
+
+## SUMMARY
+- Total unique airports: 103
+- Total flight records: 49,999
+- Data year: 2013
+
+## TOP 20 SOURCE AIRPORTS (by frequency)
+1.  EWR - Newark Liberty International Airport (4,555 flights)
+2.  JFK - John F. Kennedy International Airport (4,325 flights)
+3.  LGA - LaGuardia Airport (3,620 flights)
+4.  ATL - Hartsfield-Jackson Atlanta International Airport (647 flights)
+5.  ORD - O'Hare International Airport (591 flights)
+6.  MCO - Orlando International Airport (557 flights)
+7.  FLL - Fort Lauderdale-Hollywood International Airport (549 flights)
+8.  LAX - Los Angeles International Airport (542 flights)
+9.  BOS - Boston Logan International Airport (526 flights)
+10. CLT - Charlotte Douglas International Airport (489 flights)
+11. MIA - Miami International Airport (455 flights)
+12. SFO - San Francisco International Airport (418 flights)
+13. DFW - Dallas/Fort Worth International Airport (364 flights)
+14. DCA - Ronald Reagan Washington National Airport (364 flights)
+15. DTW - Detroit Metropolitan Wayne County Airport (360 flights)
+16. RDU - Raleigh-Durham International Airport (338 flights)
+17. PBI - Palm Beach International Airport (291 flights)
+18. TPA - Tampa International Airport (284 flights)
+19. DEN - Denver International Airport (268 flights)
+20. IAH - George Bush Intercontinental Airport (263 flights)
+
+## TOP 20 DESTINATION AIRPORTS (by frequency)
+1.  EWR - Newark Liberty International Airport (4,371 flights)
+2.  LGA - LaGuardia Airport (4,163 flights)
+3.  JFK - John F. Kennedy International Airport (3,966 flights)
+4.  ORD - O'Hare International Airport (694 flights)
+5.  ATL - Hartsfield-Jackson Atlanta International Airport (627 flights)
+6.  LAX - Los Angeles International Airport (614 flights)
+7.  BOS - Boston Logan International Airport (582 flights)
+8.  CLT - Charlotte Douglas International Airport (565 flights)
+9.  SFO - San Francisco International Airport (531 flights)
+10. MCO - Orlando International Airport (479 flights)
+11. MIA - Miami International Airport (422 flights)
+12. FLL - Fort Lauderdale-Hollywood International Airport (386 flights)
+13. DTW - Detroit Metropolitan Wayne County Airport (355 flights)
+14. DCA - Ronald Reagan Washington National Airport (334 flights)
+15. DFW - Dallas/Fort Worth International Airport (314 flights)
+16. RDU - Raleigh-Durham International Airport (304 flights)
+17. MSP - Minneapolis-Saint Paul International Airport (297 flights)
+18. IAH - George Bush Intercontinental Airport (267 flights)
+19. DEN - Denver International Airport (267 flights)
+20. TPA - Tampa International Airport (258 flights)
+
+## KEY INSIGHTS
+- The New York area airports (EWR, JFK, LGA) dominate the database
+- EWR (Newark) is the busiest airport with over 9,000 total flights
+- Major hub airports like ATL, ORD, LAX, BOS are well represented
+- The database covers major US cities and popular tourist destinations
+- International airports like SJU (Puerto Rico) and STT (U.S. Virgin Islands) are included
+
+## RECOMMENDED SEARCH ROUTES
+For best results, try these popular routes:
+- EWR ↔ JFK (New York area)
+- EWR ↔ ATL (Newark to Atlanta)
+- EWR ↔ BOS (Newark to Boston)
+- EWR ↔ SEA (Newark to Seattle)
+- JFK ↔ LAX (New York to Los Angeles)
+- ATL ↔ MIA (Atlanta to Miami)
+- ORD ↔ LAX (Chicago to Los Angeles) 

@@ -23,9 +23,11 @@ export function useFlightSearch() {
           variant: "destructive",
         });
       } else {
+        const priorityText = params.priority === "cost" ? "lowest cost" : 
+                           params.priority === "time" ? "shortest duration" : "optimized";
         toast({
           title: `${results.length} flights found`,
-          description: "Here are your search results.",
+          description: `Results sorted by ${priorityText}.`,
         });
       }
     } catch (err) {
@@ -81,12 +83,12 @@ export function useFlightSearch() {
     }
   }, [toast]);
 
-  const searchByRoute = useCallback(async (source: string, destination: string) => {
+  const searchByRoute = useCallback(async (source: string, destination: string, priority: string = "cost") => {
     setLoading(true);
     setError(null);
     
     try {
-      const results = await apiService.searchByRoute(source, destination);
+      const results = await apiService.searchByRoute(source, destination, priority);
       setFlights(results);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to search flights';
@@ -101,12 +103,12 @@ export function useFlightSearch() {
     }
   }, [toast]);
 
-  const getAllFlights = useCallback(async () => {
+  const getAllFlights = useCallback(async (priority: string = "cost") => {
     setLoading(true);
     setError(null);
     
     try {
-      const results = await apiService.getAllFlights();
+      const results = await apiService.getAllFlights(priority);
       setFlights(results);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch flights';

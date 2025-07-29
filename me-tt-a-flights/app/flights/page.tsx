@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
-import { Plane, Filter, Calendar, MapPin, DollarSign, Star, Heart, Loader2, ArrowLeftRight } from "lucide-react"
+import { Plane, Filter, Calendar, MapPin, DollarSign, Star, Heart, Loader2, ArrowLeftRight, Clock, Zap } from "lucide-react"
 import { useFlightSearch } from "@/hooks/use-flight-search"
 import { Flight } from "@/lib/api"
 import { getAirportLocation } from "@/lib/airports"
@@ -19,7 +19,8 @@ import { getAirportLocation } from "@/lib/airports"
 export default function FlightsPage() {
   const { flights: mettaFlights, loading, error, getAllFlights, searchFlights } = useFlightSearch()
   const [filteredFlights, setFilteredFlights] = useState<Flight[]>([])
-  const [sortBy, setSortBy] = useState("cost")
+  const [priority, setPriority] = useState<"cost" | "time" | "optimized">("cost")
+  const [includeConnections, setIncludeConnections] = useState(true)
   const [priceRange, setPriceRange] = useState([0, 10000])
   const [selectedSources, setSelectedSources] = useState<string[]>([])
   const [selectedDestinations, setSelectedDestinations] = useState<string[]>([])
@@ -48,6 +49,8 @@ export default function FlightsPage() {
       year,
       month,
       day,
+      priority,
+      include_connections: includeConnections,
     }
     
     try {
@@ -69,22 +72,6 @@ export default function FlightsPage() {
       const sourceMatch = selectedSources.length === 0 || selectedSources.includes(flight.source)
       const destMatch = selectedDestinations.length === 0 || selectedDestinations.includes(flight.destination)
       return inPriceRange && sourceMatch && destMatch
-    })
-    .sort((a, b) => {
-      switch (sortBy) {
-        case "cost":
-          return parseInt(a.cost) - parseInt(b.cost)
-        case "date":
-          const dateA = new Date(`${a.year}-${a.month}-${a.day}`)
-          const dateB = new Date(`${b.year}-${b.month}-${b.day}`)
-          return dateA.getTime() - dateB.getTime()
-        case "source":
-          return a.source.localeCompare(b.source)
-        case "destination":
-          return a.destination.localeCompare(b.destination)
-        default:
-          return 0
-      }
     })
 
   const formatDate = (year: string, month: string, day: string) => {
@@ -110,6 +97,19 @@ export default function FlightsPage() {
     return `$${parseInt(cost).toLocaleString()}`
   }
 
+  const formatTime = (time: string) => {
+    // Convert HHMM to HH:MM format
+    const hour = time.slice(0, 2)
+    const minute = time.slice(2, 4)
+    return `${hour}:${minute}`
+  }
+
+  const formatDuration = (minutes: number) => {
+    const hours = Math.floor(minutes / 60)
+    const mins = minutes % 60
+    return `${hours}h ${mins}m`
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
@@ -120,6 +120,32 @@ export default function FlightsPage() {
           <FlightSearch onSearch={handleSearch} />
         </div>
 
+        {/* Priority and Connection Options */}
+        <div className="mb-6 flex flex-wrap gap-4 items-center">
+          <div className="flex items-center space-x-2">
+            <Label htmlFor="priority">Sort by:</Label>
+            <Select value={priority} onValueChange={(value: "cost" | "time" | "optimized") => setPriority(value)}>
+              <SelectTrigger className="w-32">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="cost">Cost</SelectItem>
+                <SelectItem value="time">Time</SelectItem>
+                <SelectItem value="optimized">Optimized</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <Checkbox 
+              id="connections" 
+              checked={includeConnections} 
+              onCheckedChange={(checked) => setIncludeConnections(checked as boolean)}
+            />
+            <Label htmlFor="connections">Include connecting flights</Label>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Filters Sidebar */}
           <div className="lg:col-span-1">
@@ -127,267 +153,229 @@ export default function FlightsPage() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="flex items-center">
-                    <Filter className="mr-2 h-5 w-5" />
+                    <Filter className="mr-2 h-4 w-4" />
                     Filters
                   </CardTitle>
-                  <Button variant="ghost" size="sm" className="lg:hidden" onClick={() => setShowFilters(!showFilters)}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowFilters(!showFilters)}
+                  >
                     {showFilters ? "Hide" : "Show"}
                   </Button>
                 </div>
               </CardHeader>
-              <CardContent className={`space-y-6 ${showFilters ? "block" : "hidden lg:block"}`}>
-                {/* Price Range */}
-                <div>
-                  <Label className="text-sm font-medium mb-3 block">Price Range</Label>
-                  <Slider
-                    value={priceRange}
-                    onValueChange={setPriceRange}
-                    max={10000}
-                    min={0}
-                    step={100}
-                    className="mb-2"
-                  />
-                  <div className="flex justify-between text-sm text-muted-foreground">
-                    <span>${priceRange[0]}</span>
-                    <span>${priceRange[1]}</span>
+              
+              {showFilters && (
+                <CardContent className="space-y-6">
+                  {/* Price Range */}
+                  <div>
+                    <Label className="text-sm font-medium">
+                      Price Range: ${priceRange[0]} - ${priceRange[1]}
+                    </Label>
+                    <Slider
+                      value={priceRange}
+                      onValueChange={setPriceRange}
+                      max={10000}
+                      min={0}
+                      step={100}
+                      className="mt-2"
+                    />
                   </div>
-                </div>
 
-                <Separator />
-
-                {/* Source Airports */}
-                <div>
-                  <Label className="text-sm font-medium mb-3 block">Source Airports</Label>
-                  <div className="space-y-2 max-h-40 overflow-y-auto">
-                    {uniqueSources.map((source) => (
-                      <div key={source} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={`source-${source}`}
-                          checked={selectedSources.includes(source)}
-                          onCheckedChange={(checked) => {
-                            if (checked) {
-                              setSelectedSources([...selectedSources, source])
-                            } else {
-                              setSelectedSources(selectedSources.filter(s => s !== source))
-                            }
-                          }}
-                        />
-                        <Label htmlFor={`source-${source}`} className="text-sm">{source}</Label>
-                      </div>
-                    ))}
+                  {/* Source Airports */}
+                  <div>
+                    <Label className="text-sm font-medium">Source Airports</Label>
+                    <div className="mt-2 space-y-2 max-h-32 overflow-y-auto">
+                      {uniqueSources.map((source) => (
+                        <div key={source} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={`source-${source}`}
+                            checked={selectedSources.includes(source)}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                setSelectedSources([...selectedSources, source])
+                              } else {
+                                setSelectedSources(selectedSources.filter(s => s !== source))
+                              }
+                            }}
+                          />
+                          <Label htmlFor={`source-${source}`} className="text-sm">
+                            {source}
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
 
-                <Separator />
-
-                {/* Destination Airports */}
-                <div>
-                  <Label className="text-sm font-medium mb-3 block">Destination Airports</Label>
-                  <div className="space-y-2 max-h-40 overflow-y-auto">
-                    {uniqueDestinations.map((destination) => (
-                      <div key={destination} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={`dest-${destination}`}
-                          checked={selectedDestinations.includes(destination)}
-                          onCheckedChange={(checked) => {
-                            if (checked) {
-                              setSelectedDestinations([...selectedDestinations, destination])
-                            } else {
-                              setSelectedDestinations(selectedDestinations.filter(d => d !== destination))
-                            }
-                          }}
-                        />
-                        <Label htmlFor={`dest-${destination}`} className="text-sm">{destination}</Label>
-                      </div>
-                    ))}
+                  {/* Destination Airports */}
+                  <div>
+                    <Label className="text-sm font-medium">Destination Airports</Label>
+                    <div className="mt-2 space-y-2 max-h-32 overflow-y-auto">
+                      {uniqueDestinations.map((dest) => (
+                        <div key={dest} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={`dest-${dest}`}
+                            checked={selectedDestinations.includes(dest)}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                setSelectedDestinations([...selectedDestinations, dest])
+                              } else {
+                                setSelectedDestinations(selectedDestinations.filter(d => d !== dest))
+                              }
+                            }}
+                          />
+                          <Label htmlFor={`dest-${dest}`} className="text-sm">
+                            {dest}
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              </CardContent>
+                </CardContent>
+              )}
             </Card>
           </div>
 
-          {/* Results Section */}
+          {/* Flight Results */}
           <div className="lg:col-span-3">
-            {/* Results Header */}
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-2xl font-bold">Flight Results</h2>
-                <p className="text-muted-foreground">
-                  {!hasSearched ? "Nothing searched yet" : loading ? "Loading flights..." : mettaFlights.length > 0 ? `${sortedAndFilteredFlights.length} flights found` : "Search for flights to get started"}
-                </p>
-              </div>
-              
-              <div className="flex items-center space-x-4">
-                <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger className="w-40">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="cost">Price: Low to High</SelectItem>
-                    <SelectItem value="date">Date</SelectItem>
-                    <SelectItem value="source">Source</SelectItem>
-                    <SelectItem value="destination">Destination</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            {/* Loading State */}
-            {hasSearched && loading && (
+            {loading && (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="h-8 w-8 animate-spin mr-2" />
-                <span>Loading flights...</span>
+                <span>Searching flights...</span>
               </div>
             )}
 
-            {/* Error State */}
             {error && (
               <Card className="border-destructive">
                 <CardContent className="pt-6">
-                  <div className="text-center text-destructive">
-                    <p>Error loading flights: {error}</p>
-                    <Button onClick={getAllFlights} className="mt-2">Try Again</Button>
+                  <div className="text-destructive text-center">
+                    <p className="font-medium">Search Error</p>
+                    <p className="text-sm">{error}</p>
                   </div>
                 </CardContent>
               </Card>
             )}
 
-            {/* No Results */}
-            {!hasSearched && !loading && !error && (
+            {!loading && !error && sortedAndFilteredFlights.length === 0 && hasSearched && (
               <Card>
                 <CardContent className="pt-6">
-                  <div className="text-center">
-                    <Plane className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                    <h3 className="text-lg font-semibold mb-2">Ready to search flights</h3>
-                    <p className="text-muted-foreground mb-4">
-                      Use the search form above to find flights from our comprehensive flight database.
-                    </p>
+                  <div className="text-center text-muted-foreground">
+                    <Plane className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p className="font-medium">No flights found</p>
+                    <p className="text-sm">Try adjusting your search criteria or filters.</p>
                   </div>
                 </CardContent>
               </Card>
             )}
 
-            {/* No Search Results */}
-            {hasSearched && !loading && !error && sortedAndFilteredFlights.length === 0 && (
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="text-center">
-                    <Plane className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                    <h3 className="text-lg font-semibold mb-2">No flights found</h3>
-                    <p className="text-muted-foreground mb-4">
-                      Try adjusting your search criteria or filters.
-                    </p>
-                    <Button onClick={() => {
-                      setSelectedSources([])
-                      setSelectedDestinations([])
-                      setPriceRange([0, 10000])
-                    }}>
-                      Clear Filters
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Flight Results */}
-            {hasSearched && !loading && !error && sortedAndFilteredFlights.length > 0 && (
+            {!loading && !error && sortedAndFilteredFlights.length > 0 && (
               <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-lg font-semibold">
+                    {sortedAndFilteredFlights.length} flights found
+                  </h2>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => getAllFlights(priority)}
+                  >
+                    Show All Flights
+                  </Button>
+                </div>
+
                 {sortedAndFilteredFlights.map((flight, index) => (
-                  <Card key={`${flight.source}-${flight.destination}-${flight.year}-${flight.month}-${flight.day}-${index}`} className="hover:shadow-md transition-shadow">
+                  <Card key={index} className="hover:shadow-md transition-shadow">
                     <CardContent className="p-6">
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4">
-                          {flight.airline ? (
-                            <div className="flex items-center justify-center w-12 h-12 bg-white border rounded-lg overflow-hidden relative">
+                        {/* Flight Info */}
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-4 mb-4">
+                            {/* Airline Logo */}
+                            {flight.airline?.logo && (
                               <img 
                                 src={flight.airline.logo} 
                                 alt={flight.airline.name}
-                                className="w-full h-full object-contain p-1"
+                                className="h-8 w-8 object-contain"
                                 onError={(e) => {
-                                  // Fallback to plane icon if image fails to load
-                                  e.currentTarget.style.display = 'none';
-                                  const fallback = e.currentTarget.parentElement?.querySelector('.fallback-icon');
-                                  if (fallback) {
-                                    fallback.classList.remove('hidden');
-                                  }
+                                  e.currentTarget.style.display = 'none'
                                 }}
                               />
-                              <Plane className="h-6 w-6 text-primary hidden fallback-icon absolute inset-0 m-auto" />
-                            </div>
-                          ) : (
-                            <div className="flex items-center justify-center w-12 h-12 bg-primary/10 rounded-full">
-                              <Plane className="h-6 w-6 text-primary" />
-                            </div>
-                          )}
-                          
-                          <div className="space-y-1">
-                            <div className="flex items-center space-x-8">
-                              <div className="flex items-center space-x-2">
-                                <MapPin className="h-4 w-4 text-muted-foreground" />
-                                <div>
-                                  <span className="font-medium">{flight.source}</span>
-                                  <div className="text-xs text-muted-foreground">
-                                    {getAirportLocation(flight.source)}
-                                  </div>
-                                </div>
-                              </div>
-                              
-                              {/* Arrow separator */}
-                              <div className="flex items-center text-muted-foreground">
-                                <ArrowLeftRight className="h-4 w-4" />
-                              </div>
-                              
-                              <div className="flex items-center space-x-2">
-                                <MapPin className="h-4 w-4 text-muted-foreground" />
-                                <div>
-                                  <span className="font-medium">{flight.destination}</span>
-                                  <div className="text-xs text-muted-foreground">
-                                    {getAirportLocation(flight.destination)}
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
+                            )}
                             
-                            <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                              <div className="flex items-center space-x-1">
-                                <Calendar className="h-4 w-4" />
-                                <span>{formatDate(flight.year, flight.month, flight.day)}</span>
-                              </div>
-                              {flight.airline && (
-                                <div className="flex items-center space-x-1">
-                                  <span className="text-xs font-medium text-primary">{flight.airline.code}</span>
-                                  <span>•</span>
-                                  <span className="text-xs">{flight.airline.name}</span>
-                                </div>
-                              )}
+                            {/* Route */}
+                            <div className="flex items-center space-x-2">
+                              <span className="font-semibold text-lg">{flight.source}</span>
+                              <ArrowLeftRight className="h-4 w-4 text-muted-foreground" />
+                              <span className="font-semibold text-lg">{flight.destination}</span>
+                            </div>
+
+                            {/* Connection Badge */}
+                            {flight.is_connecting && (
+                              <Badge variant="secondary" className="ml-2">
+                                <Plane className="h-3 w-3 mr-1" />
+                                Connecting
+                              </Badge>
+                            )}
+                          </div>
+
+                          {/* Flight Details */}
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                            <div>
+                              <p className="text-muted-foreground">Date</p>
+                              <p className="font-medium">{formatDate(flight.year, flight.month, flight.day)}</p>
+                            </div>
+                            <div>
+                              <p className="text-muted-foreground">Time</p>
+                              <p className="font-medium">
+                                {formatTime(flight.takeoff)} - {formatTime(flight.landing)}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-muted-foreground">Duration</p>
+                              <p className="font-medium flex items-center">
+                                <Clock className="h-3 w-3 mr-1" />
+                                {formatDuration(flight.duration)}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-muted-foreground">Price</p>
+                              <p className="font-medium text-lg text-green-600">
+                                {formatCost(flight.cost)}
+                              </p>
                             </div>
                           </div>
-                        </div>
 
-                        <div className="text-right">
-                          <div className="text-2xl font-bold text-primary">
-                            {formatCost(flight.cost)}
-                          </div>
-                          <div className="text-sm text-muted-foreground">
-                            {flight.airline ? flight.airline.name : 'MeTTa Flight'}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="mt-4 flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                          <Badge variant="secondary">Direct Flight</Badge>
-                          {flight.airline && (
-                            <Badge variant="outline" className="text-xs">
-                              {flight.airline.code}
-                            </Badge>
+                          {/* Connection Details */}
+                          {flight.is_connecting && flight.connection_airport && (
+                            <div className="mt-3 p-3 bg-muted rounded-lg">
+                              <p className="text-sm text-muted-foreground">
+                                Connection at {flight.connection_airport}
+                                {flight.layover_hours && ` (${flight.layover_hours.toFixed(1)}h layover)`}
+                              </p>
+                            </div>
                           )}
-                          <Badge variant="outline">MeTTa Data</Badge>
+
+                          {/* Airline Info */}
+                          {flight.airline && (
+                            <div className="mt-3 flex items-center space-x-2">
+                              <span className="text-sm text-muted-foreground">Operated by</span>
+                              <span className="text-sm font-medium">{flight.airline.name}</span>
+                            </div>
+                          )}
                         </div>
-                        
-                        <Button size="sm">
-                          Select Flight
-                        </Button>
+
+                        {/* Action Buttons */}
+                        <div className="flex flex-col space-y-2 ml-4">
+                          <Button size="sm">
+                            <DollarSign className="h-4 w-4 mr-1" />
+                            Book Now
+                          </Button>
+                          <Button variant="outline" size="sm">
+                            <Heart className="h-4 w-4 mr-1" />
+                            Save
+                          </Button>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>

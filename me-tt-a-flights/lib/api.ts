@@ -13,6 +13,16 @@ export interface AirlineInfo {
   name: string;
   logo: string;
   description: string;
+  frequency?: number;
+}
+
+export interface FlightSegment {
+  source: string;
+  destination: string;
+  takeoff: string;
+  landing: string;
+  duration: number;
+  cost: string;
 }
 
 export interface Flight {
@@ -22,7 +32,14 @@ export interface Flight {
   source: string;
   destination: string;
   cost: string;
+  takeoff: string;
+  landing: string;
+  duration: number;
   airline?: AirlineInfo;
+  is_connecting?: boolean;
+  connection_airport?: string;
+  layover_hours?: number;
+  segments?: FlightSegment[];
 }
 
 export interface FlightSearchRequest {
@@ -31,6 +48,15 @@ export interface FlightSearchRequest {
   year?: number;
   month?: number;
   day?: number;
+  priority?: "cost" | "time" | "optimized";
+  include_connections?: boolean;
+}
+
+export interface RouteCompetitionInfo {
+  route: string;
+  airlines: AirlineInfo[];
+  competition_level: string;
+  airline_count: number;
 }
 
 class ApiService {
@@ -70,8 +96,8 @@ class ApiService {
     });
   }
 
-  async getAllFlights(): Promise<Flight[]> {
-    return this.request<Flight[]>('/api/flights/all');
+  async getAllFlights(priority: string = "cost"): Promise<Flight[]> {
+    return this.request<Flight[]>(`/api/flights/all?priority=${priority}`);
   }
 
   async searchBySource(source: string): Promise<Flight[]> {
@@ -82,8 +108,24 @@ class ApiService {
     return this.request<Flight[]>(`/api/flights/destination/${encodeURIComponent(destination)}`);
   }
 
-  async searchByRoute(source: string, destination: string): Promise<Flight[]> {
-    return this.request<Flight[]>(`/api/flights/route/${encodeURIComponent(source)}/${encodeURIComponent(destination)}`);
+  async searchByRoute(source: string, destination: string, priority: string = "cost"): Promise<Flight[]> {
+    return this.request<Flight[]>(`/api/flights/route/${encodeURIComponent(source)}/${encodeURIComponent(destination)}?priority=${priority}`);
+  }
+
+  async getAirlines(): Promise<AirlineInfo[]> {
+    return this.request<AirlineInfo[]>('/api/airlines');
+  }
+
+  async getAirlineInfo(airlineCode: string): Promise<AirlineInfo> {
+    return this.request<AirlineInfo>(`/api/airlines/${airlineCode}`);
+  }
+
+  async getRouteCompetition(source: string, destination: string): Promise<RouteCompetitionInfo> {
+    return this.request<RouteCompetitionInfo>(`/api/routes/${encodeURIComponent(source)}/${encodeURIComponent(destination)}/competition`);
+  }
+
+  async searchAirports(query: string, limit: number = 10): Promise<any[]> {
+    return this.request<any[]>(`/api/airports/search?query=${encodeURIComponent(query)}&limit=${limit}`);
   }
 
   async healthCheck(): Promise<{ status: string; message: string }> {
