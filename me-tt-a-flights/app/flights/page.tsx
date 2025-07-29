@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useSearchParams } from "next/navigation"
 import { Navigation } from "@/components/navigation"
 import { FlightSearch } from "@/components/flight-search"
 import { Button } from "@/components/ui/button"
@@ -17,6 +18,7 @@ import { Flight } from "@/lib/api"
 import { getAirportLocation } from "@/lib/airports"
 
 export default function FlightsPage() {
+  const searchParams = useSearchParams()
   const { flights: mettaFlights, loading, error, getAllFlights, searchFlights } = useFlightSearch()
   const [filteredFlights, setFilteredFlights] = useState<Flight[]>([])
   const [priority, setPriority] = useState<"cost" | "time" | "optimized">("cost")
@@ -26,6 +28,39 @@ export default function FlightsPage() {
   const [selectedDestinations, setSelectedDestinations] = useState<string[]>([])
   const [showFilters, setShowFilters] = useState(false)
   const [hasSearched, setHasSearched] = useState(false)
+
+  // Get initial values from URL parameters
+  const initialFrom = searchParams.get('from') || undefined
+  const initialTo = searchParams.get('to') || undefined
+  const initialDateStr = searchParams.get('date')
+  const initialDate = initialDateStr ? new Date(initialDateStr) : undefined
+
+  // Handle URL parameters on page load
+  useEffect(() => {
+    const from = searchParams.get('from')
+    const to = searchParams.get('to')
+    const date = searchParams.get('date')
+    
+    if (from || to || date) {
+      // Parse the date if provided
+      let departDate: Date | undefined
+      if (date) {
+        departDate = new Date(date)
+        // Check if the date is valid
+        if (isNaN(departDate.getTime())) {
+          departDate = undefined
+        }
+      }
+      
+      const searchData = {
+        from: from || '',
+        to: to || '',
+        departDate,
+      }
+      
+      handleSearch(searchData)
+    }
+  }, [searchParams])
 
   // Update filtered flights when MeTTa flights change
   useEffect(() => {
@@ -117,7 +152,12 @@ export default function FlightsPage() {
       <div className="container mx-auto px-4 py-8">
         {/* Search Section */}
         <div className="mb-8">
-          <FlightSearch onSearch={handleSearch} />
+          <FlightSearch 
+            onSearch={handleSearch} 
+            initialFrom={initialFrom}
+            initialTo={initialTo}
+            initialDate={initialDate}
+          />
         </div>
 
         {/* Priority and Connection Options */}
