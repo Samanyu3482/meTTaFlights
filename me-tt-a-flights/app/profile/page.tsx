@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Navigation } from "@/components/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -16,19 +16,33 @@ import { User, Mail, Phone, MapPin, Calendar, Award, Plane, Settings, Camera } f
 import Link from "next/link"
 
 export default function ProfilePage() {
-  const { user } = useAuth()
+  const { user, updateProfile } = useAuth()
   const { toast } = useToast()
   const [isEditing, setIsEditing] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const [profileData, setProfileData] = useState({
-    firstName: "John",
-    lastName: "Doe",
-    email: user?.email || "",
-    phone: "+1 (555) 123-4567",
-    dateOfBirth: "1990-01-01",
-    nationality: "US",
-    address: "123 Main St, New York, NY 10001",
-    emergencyContact: "Jane Doe - +1 (555) 987-6543",
+    name: "",
+    email: "",
+    phone: "",
+    date_of_birth: "",
+    nationality: "",
+    address: "",
+    emergency_contact: "",
   })
+
+  useEffect(() => {
+    if (user) {
+      setProfileData({
+        name: user.name || "",
+        email: user.email || "",
+        phone: user.phone || "",
+        date_of_birth: user.date_of_birth || "",
+        nationality: user.nationality || "",
+        address: user.address || "",
+        emergency_contact: user.emergency_contact || "",
+      })
+    }
+  }, [user])
 
   if (!user) {
     return (
@@ -50,25 +64,47 @@ export default function ProfilePage() {
     )
   }
 
-  const handleSave = () => {
-    toast({
-      title: "Profile updated",
-      description: "Your profile information has been saved successfully.",
-    })
-    setIsEditing(false)
+  const handleSave = async () => {
+    setIsLoading(true)
+    try {
+      await updateProfile(profileData)
+      toast({
+        title: "Profile updated",
+        description: "Your profile information has been saved successfully.",
+      })
+      setIsEditing(false)
+    } catch (error) {
+      toast({
+        title: "Update failed",
+        description: "Failed to update profile. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
-  const getMembershipColor = (tier: string) => {
-    switch (tier) {
-      case "Platinum":
-        return "bg-gray-800 text-white"
-      case "Gold":
-        return "bg-yellow-500 text-white"
-      case "Silver":
-        return "bg-gray-400 text-white"
-      default:
-        return "bg-orange-500 text-white"
-    }
+  const getMembershipColor = () => {
+    // Simple membership tier based on account age
+    const createdAt = new Date(user.created_at)
+    const now = new Date()
+    const monthsSinceCreation = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24 * 30)
+    
+    if (monthsSinceCreation > 24) return "bg-gray-800 text-white" // Platinum
+    if (monthsSinceCreation > 12) return "bg-yellow-500 text-white" // Gold
+    if (monthsSinceCreation > 6) return "bg-gray-400 text-white" // Silver
+    return "bg-orange-500 text-white" // Bronze
+  }
+
+  const getMembershipTier = () => {
+    const createdAt = new Date(user.created_at)
+    const now = new Date()
+    const monthsSinceCreation = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24 * 30)
+    
+    if (monthsSinceCreation > 24) return "Platinum"
+    if (monthsSinceCreation > 12) return "Gold"
+    if (monthsSinceCreation > 6) return "Silver"
+    return "Bronze"
   }
 
   return (
@@ -83,7 +119,7 @@ export default function ProfilePage() {
               <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6">
                 <div className="relative">
                   <Avatar className="h-24 w-24">
-                    <AvatarImage src={user.avatar || "/placeholder.svg"} alt={user.name} />
+                    <AvatarImage src="/placeholder-user.jpg" alt={user.name} />
                     <AvatarFallback className="text-2xl">
                       {user.name
                         .split(" ")
@@ -105,13 +141,13 @@ export default function ProfilePage() {
                   <p className="text-muted-foreground mb-4">{user.email}</p>
 
                   <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
-                    <Badge className={`${getMembershipColor(user.membershipTier || "Bronze")} px-3 py-1`}>
+                    <Badge className={`${getMembershipColor()} px-3 py-1`}>
                       <Award className="h-4 w-4 mr-1" />
-                      {user.membershipTier} Member
+                      {getMembershipTier()} Member
                     </Badge>
                     <div className="flex items-center text-sm text-muted-foreground">
                       <Plane className="h-4 w-4 mr-1" />
-                      {user.loyaltyPoints?.toLocaleString()} Points
+                      Member since {new Date(user.created_at).toLocaleDateString()}
                     </div>
                   </div>
                 </div>
@@ -120,6 +156,7 @@ export default function ProfilePage() {
                   onClick={() => setIsEditing(!isEditing)}
                   variant={isEditing ? "outline" : "default"}
                   className={!isEditing ? "flight-gradient text-white" : ""}
+                  disabled={isLoading}
                 >
                   <Settings className="h-4 w-4 mr-2" />
                   {isEditing ? "Cancel" : "Edit Profile"}
@@ -144,25 +181,14 @@ export default function ProfilePage() {
                 <CardTitle>Personal Information</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="firstName">First Name</Label>
-                    <Input
-                      id="firstName"
-                      value={profileData.firstName}
-                      onChange={(e) => setProfileData({ ...profileData, firstName: e.target.value })}
-                      disabled={!isEditing}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="lastName">Last Name</Label>
-                    <Input
-                      id="lastName"
-                      value={profileData.lastName}
-                      onChange={(e) => setProfileData({ ...profileData, lastName: e.target.value })}
-                      disabled={!isEditing}
-                    />
-                  </div>
+                <div>
+                  <Label htmlFor="name">Full Name</Label>
+                  <Input
+                    id="name"
+                    value={profileData.name}
+                    onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
+                    disabled={!isEditing}
+                  />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -174,7 +200,7 @@ export default function ProfilePage() {
                         id="email"
                         value={profileData.email}
                         onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
-                        disabled={!isEditing}
+                        disabled={true} // Email cannot be changed
                         className="pl-10"
                       />
                     </div>
@@ -202,8 +228,8 @@ export default function ProfilePage() {
                       <Input
                         id="dateOfBirth"
                         type="date"
-                        value={profileData.dateOfBirth}
-                        onChange={(e) => setProfileData({ ...profileData, dateOfBirth: e.target.value })}
+                        value={profileData.date_of_birth}
+                        onChange={(e) => setProfileData({ ...profileData, date_of_birth: e.target.value })}
                         disabled={!isEditing}
                         className="pl-10"
                       />
@@ -224,6 +250,10 @@ export default function ProfilePage() {
                         <SelectItem value="UK">United Kingdom</SelectItem>
                         <SelectItem value="CA">Canada</SelectItem>
                         <SelectItem value="AU">Australia</SelectItem>
+                        <SelectItem value="IN">India</SelectItem>
+                        <SelectItem value="DE">Germany</SelectItem>
+                        <SelectItem value="FR">France</SelectItem>
+                        <SelectItem value="JP">Japan</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -247,8 +277,8 @@ export default function ProfilePage() {
                   <Label htmlFor="emergencyContact">Emergency Contact</Label>
                   <Input
                     id="emergencyContact"
-                    value={profileData.emergencyContact}
-                    onChange={(e) => setProfileData({ ...profileData, emergencyContact: e.target.value })}
+                    value={profileData.emergency_contact}
+                    onChange={(e) => setProfileData({ ...profileData, emergency_contact: e.target.value })}
                     disabled={!isEditing}
                     placeholder="Name - Phone Number"
                   />
@@ -256,10 +286,18 @@ export default function ProfilePage() {
 
                 {isEditing && (
                   <div className="flex space-x-4">
-                    <Button onClick={handleSave} className="flight-gradient text-white">
-                      Save Changes
+                    <Button 
+                      onClick={handleSave} 
+                      className="flight-gradient text-white"
+                      disabled={isLoading}
+                    >
+                      {isLoading ? "Saving..." : "Save Changes"}
                     </Button>
-                    <Button variant="outline" onClick={() => setIsEditing(false)}>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setIsEditing(false)}
+                      disabled={isLoading}
+                    >
                       Cancel
                     </Button>
                   </div>
@@ -338,21 +376,23 @@ export default function ProfilePage() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-center space-y-4">
-                    <div className="w-20 h-20 mx-auto bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center">
+                    <div className={`w-20 h-20 mx-auto ${getMembershipColor()} rounded-full flex items-center justify-center`}>
                       <Award className="h-10 w-10 text-white" />
                     </div>
                     <div>
-                      <h3 className="text-2xl font-bold">{user.membershipTier} Member</h3>
-                      <p className="text-muted-foreground">Since January 2023</p>
+                      <h3 className="text-2xl font-bold">{getMembershipTier()} Member</h3>
+                      <p className="text-muted-foreground">Since {new Date(user.created_at).toLocaleDateString()}</p>
                     </div>
                     <div className="space-y-2">
                       <div className="flex justify-between">
-                        <span>Current Points</span>
-                        <span className="font-bold">{user.loyaltyPoints?.toLocaleString()}</span>
+                        <span>Account Status</span>
+                        <span className="font-bold text-green-600">Active</span>
                       </div>
                       <div className="flex justify-between">
-                        <span>Points to Platinum</span>
-                        <span className="font-bold">2,500</span>
+                        <span>Email Verified</span>
+                        <span className={`font-bold ${user.is_verified ? 'text-green-600' : 'text-red-600'}`}>
+                          {user.is_verified ? 'Yes' : 'No'}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -367,15 +407,15 @@ export default function ProfilePage() {
                   <div className="space-y-3">
                     <div className="flex items-center space-x-2">
                       <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span className="text-sm">Priority boarding</span>
+                      <span className="text-sm">Priority booking</span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span className="text-sm">Free seat selection</span>
+                      <span className="text-sm">Exclusive deals</span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span className="text-sm">Extra baggage allowance</span>
+                      <span className="text-sm">24/7 customer support</span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <div className="w-2 h-2 bg-gray-400 rounded-full"></div>

@@ -1,32 +1,50 @@
 #!/bin/bash
 
-echo "🚀 Starting MeTTa Flight Search System..."
+echo "🚀 Starting MeTTa Flight Search System with Authentication..."
 
 # Function to cleanup background processes
 cleanup() {
     echo "🛑 Shutting down servers..."
-    kill $BACKEND_PID $FRONTEND_PID 2>/dev/null
+    kill $FLIGHT_BACKEND_PID $AUTH_BACKEND_PID $FRONTEND_PID 2>/dev/null
     exit 0
 }
 
 # Set up signal handlers
 trap cleanup SIGINT SIGTERM
 
-# Start the MeTTa backend
-echo "📡 Starting MeTTa Backend (FastAPI)..."
+# Start the MeTTa flight search backend
+echo "📡 Starting MeTTa Flight Search Backend (FastAPI) on port 8000..."
 cd project
 python api.py &
-BACKEND_PID=$!
+FLIGHT_BACKEND_PID=$!
 cd ..
 
-# Wait a moment for backend to start
+# Wait a moment for flight backend to start
 sleep 3
 
-# Check if backend is running
+# Check if flight backend is running
 if curl -s http://localhost:8000/health > /dev/null; then
-    echo "✅ Backend is running on http://localhost:8000"
+    echo "✅ Flight Search Backend is running on http://localhost:8000"
 else
-    echo "❌ Backend failed to start"
+    echo "❌ Flight Search Backend failed to start"
+    exit 1
+fi
+
+# Start the Authentication backend
+echo "🔐 Starting Authentication Backend (FastAPI) on port 8001..."
+cd backend
+python api.py &
+AUTH_BACKEND_PID=$!
+cd ..
+
+# Wait a moment for auth backend to start
+sleep 3
+
+# Check if auth backend is running
+if curl -s http://localhost:8001/health > /dev/null; then
+    echo "✅ Authentication Backend is running on http://localhost:8001"
+else
+    echo "❌ Authentication Backend failed to start"
     exit 1
 fi
 
@@ -40,12 +58,14 @@ cd ..
 # Wait a moment for frontend to start
 sleep 5
 
-echo "🎉 MeTTa Flight Search System is running!"
+echo "🎉 MeTTa Flight Search System with Authentication is running!"
 echo "📱 Frontend: http://localhost:3000"
-echo "🔧 Backend API: http://localhost:8000"
-echo "📚 API Docs: http://localhost:8000/docs"
+echo "🔧 Flight Search API: http://localhost:8000"
+echo "🔐 Authentication API: http://localhost:8001"
+echo "📚 Flight API Docs: http://localhost:8000/docs"
+echo "📚 Auth API Docs: http://localhost:8001/docs"
 echo ""
-echo "Press Ctrl+C to stop both servers"
+echo "Press Ctrl+C to stop all servers"
 
 # Wait for user to stop
 wait 
