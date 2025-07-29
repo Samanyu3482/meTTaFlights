@@ -1,5 +1,5 @@
 import { Navigation } from "@/components/navigation"
-import { FlightSearch } from "@/components/flight-search"
+import { HomeSearch } from "@/components/home-search"
 import { TypewriterText } from "@/components/typewriter-text"
 import { AnimatedCounter } from "@/components/animated-counter"
 import { Button } from "@/components/ui/button"
@@ -200,7 +200,7 @@ export default function HomePage() {
 
           {/* Search Widget */}
           <div className="max-w-4xl mx-auto">
-            <FlightSearch />
+            <HomeSearch />
           </div>
         </div>
       </section>

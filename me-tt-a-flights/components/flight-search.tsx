@@ -18,13 +18,17 @@ import { AirportAutocomplete } from "./airport-autocomplete"
 interface FlightSearchProps {
   onSearch?: (searchData: any) => void
   className?: string
+  initialFrom?: string
+  initialTo?: string
+  initialDate?: Date
 }
 
-export function FlightSearch({ onSearch, className }: FlightSearchProps) {
+export function FlightSearch({ onSearch, className, initialFrom, initialTo, initialDate }: FlightSearchProps) {
   const [tripType, setTripType] = useState("roundtrip")
-  const [from, setFrom] = useState("")
-  const [to, setTo] = useState("")
+  const [from, setFrom] = useState(initialFrom || "")
+  const [to, setTo] = useState(initialTo || "")
   const [departDate, setDepartDate] = useState<Date>(() => {
+    if (initialDate) return initialDate
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     return tomorrow;
