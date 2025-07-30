@@ -184,4 +184,212 @@
       opacity: 0;
     }
   }
+
+  /* Background Animation Classes */
+  .animate-float-slow {
+    animation: floatSlow 8s ease-in-out infinite;
+  }
+
+  .animate-float-medium {
+    animation: floatMedium 6s ease-in-out infinite;
+  }
+
+  .animate-float-fast {
+    animation: floatFast 4s ease-in-out infinite;
+  }
+
+  .animate-pulse-slow {
+    animation: pulseSlow 3s ease-in-out infinite;
+  }
+
+  @keyframes floatSlow {
+    0%, 100% {
+      transform: translateY(0px) translateX(0px) rotate(0deg);
+    }
+    25% {
+      transform: translateY(-20px) translateX(10px) rotate(2deg);
+    }
+    50% {
+      transform: translateY(-10px) translateX(-10px) rotate(-1deg);
+    }
+    75% {
+      transform: translateY(-30px) translateX(6px) rotate(3deg);
+    }
+  }
+
+  @keyframes floatMedium {
+    0%, 100% {
+      transform: translateY(0px) translateX(0px) rotate(0deg);
+    }
+    33% {
+      transform: translateY(-15px) translateX(-8px) rotate(-2deg);
+    }
+    66% {
+      transform: translateY(-25px) translateX(8px) rotate(1deg);
+    }
+  }
+
+  @keyframes floatFast {
+    0%, 100% {
+      transform: translateY(0px) translateX(0px) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-12px) translateX(4px) rotate(1deg);
+    }
+  }
+
+  @keyframes pulseSlow {
+    0%, 100% {
+      opacity: 0.2;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.4;
+      transform: scale(1.1);
+    }
+  }
+
+  /* Glass morphism effect for cards */
+  .glass-card {
+    backdrop-filter: blur(15px);
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+
+  .glass-card-dark {
+    backdrop-filter: blur(15px);
+    background: rgba(0, 0, 0, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Enhanced background effects */
+  .bg-glow {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+  }
+
+  .bg-glow-pink {
+    box-shadow: 0 0 20px rgba(236, 72, 153, 0.3);
+  }
+
+  .bg-glow-green {
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+  }
+
+  .bg-glow-purple {
+    box-shadow: 0 0 20px rgba(147, 51, 234, 0.3);
+  }
+
+  /* 3D Animation Classes for Trips Page */
+  .animate-3d-float {
+    animation: float3d 6s ease-in-out infinite;
+  }
+
+  .animate-3d-rotate {
+    animation: rotate3d 8s linear infinite;
+  }
+
+  .animate-3d-scale {
+    animation: scale3d 4s ease-in-out infinite;
+  }
+
+  .animate-stagger {
+    animation: stagger 0.5s ease-out forwards;
+  }
+
+  .animate-card-enter {
+    animation: cardEnter 0.6s ease-out forwards;
+  }
+
+  @keyframes float3d {
+    0%, 100% {
+      transform: translateY(0px) translateX(0px) rotateX(0deg) rotateY(0deg);
+    }
+    25% {
+      transform: translateY(-15px) translateX(5px) rotateX(5deg) rotateY(-5deg);
+    }
+    50% {
+      transform: translateY(-10px) translateX(-5px) rotateX(-3deg) rotateY(3deg);
+    }
+    75% {
+      transform: translateY(-20px) translateX(3px) rotateX(8deg) rotateY(-2deg);
+    }
+  }
+
+  @keyframes rotate3d {
+    0% {
+      transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+    }
+    33% {
+      transform: rotateX(10deg) rotateY(10deg) rotateZ(5deg);
+    }
+    66% {
+      transform: rotateX(-5deg) rotateY(-10deg) rotateZ(-5deg);
+    }
+    100% {
+      transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+    }
+  }
+
+  @keyframes scale3d {
+    0%, 100% {
+      transform: scale(1) rotate(0deg);
+    }
+    50% {
+      transform: scale(1.1) rotate(180deg);
+    }
+  }
+
+  @keyframes stagger {
+    0% {
+      opacity: 0;
+      transform: translateY(30px) scale(0.9);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes cardEnter {
+    0% {
+      opacity: 0;
+      transform: translateY(50px) rotateX(-10deg);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) rotateX(0deg);
+    }
+  }
+
+  /* Enhanced glass morphism for trips */
+  .glass-card-trips {
+    backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 
+      0 8px 32px rgba(0, 0, 0, 0.1),
+      0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+  }
+
+  .glass-card-trips:hover {
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 
+      0 12px 40px rgba(0, 0, 0, 0.15),
+      0 0 0 1px rgba(255, 255, 255, 0.3) inset;
+  }
+
+  /* Travel-themed gradients */
+  .travel-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+
+  .travel-gradient-2 {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  }
+
+  .travel-gradient-3 {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  }
 }
