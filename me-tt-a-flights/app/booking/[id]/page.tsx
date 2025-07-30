@@ -17,6 +17,7 @@ import { useAuth } from "@/components/auth-provider"
 import { Flight } from "@/lib/api"
 import { bookingsApiService, CreateBookingRequest } from "@/lib/bookings-api"
 import { PassengerInfo, PaymentInfo } from "@/lib/bookings"
+import { savedDetailsApiService, SavedPassenger, SavedPayment } from "@/lib/saved-details-api"
 import { 
   Plane, 
   CreditCard, 
@@ -47,6 +48,9 @@ export default function BookingPage() {
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [passengerCount, setPassengerCount] = useState(1)
+  const [savedPassengers, setSavedPassengers] = useState<SavedPassenger[]>([])
+  const [savedPayments, setSavedPayments] = useState<SavedPayment[]>([])
+  const [loadingSavedDetails, setLoadingSavedDetails] = useState(false)
   const [bookingForm, setBookingForm] = useState<BookingForm>({
     passengers: [{
       firstName: "",
@@ -119,6 +123,29 @@ export default function BookingPage() {
     setBookingForm(prev => ({ ...prev, passengers: newPassengers }))
   }, [passengerCount])
 
+  // Load saved passengers and payments
+  useEffect(() => {
+    const loadSavedDetails = async () => {
+      if (user) {
+        setLoadingSavedDetails(true)
+        try {
+          const [passengers, payments] = await Promise.all([
+            savedDetailsApiService.getSavedPassengers(),
+            savedDetailsApiService.getSavedPayments()
+          ])
+          setSavedPassengers(passengers)
+          setSavedPayments(payments)
+        } catch (error) {
+          console.error('Error loading saved details:', error)
+        } finally {
+          setLoadingSavedDetails(false)
+        }
+      }
+    }
+
+    loadSavedDetails()
+  }, [user])
+
   const updatePassenger = (index: number, field: keyof PassengerInfo, value: string) => {
     const newPassengers = [...bookingForm.passengers]
     newPassengers[index] = { ...newPassengers[index], [field]: value }
@@ -130,6 +157,51 @@ export default function BookingPage() {
       ...prev,
       payment: { ...prev.payment, [field]: value }
     }))
+  }
+
+  const useSavedPassenger = (savedPassenger: SavedPassenger, index: number) => {
+    const convertedPassenger = savedDetailsApiService.convertSavedPassengerToBookingPassenger(savedPassenger)
+    const newPassengers = [...bookingForm.passengers]
+    newPassengers[index] = {
+      firstName: convertedPassenger.first_name,
+      lastName: convertedPassenger.last_name,
+      dateOfBirth: convertedPassenger.date_of_birth,
+      passportNumber: convertedPassenger.passport_number,
+      email: convertedPassenger.email,
+      phone: convertedPassenger.phone,
+      seatPreference: convertedPassenger.seat_preference,
+      specialRequests: convertedPassenger.special_requests || ""
+    }
+    setBookingForm(prev => ({ ...prev, passengers: newPassengers }))
+    
+    toast({
+      title: "Passenger Details Loaded",
+      description: `Loaded details for ${savedPassenger.first_name} ${savedPassenger.last_name}`,
+    })
+  }
+
+  const useSavedPayment = (savedPayment: SavedPayment) => {
+    const convertedPayment = savedDetailsApiService.convertSavedPaymentToBookingPayment(savedPayment)
+    setBookingForm(prev => ({
+      ...prev,
+      payment: {
+        ...prev.payment,
+        cardNumber: convertedPayment.card_number,
+        cardHolderName: convertedPayment.card_holder_name,
+        expiryMonth: convertedPayment.expiry_month,
+        expiryYear: convertedPayment.expiry_year,
+        billingAddress: convertedPayment.billing_address,
+        city: convertedPayment.city,
+        state: convertedPayment.state,
+        zipCode: convertedPayment.zip_code,
+        country: convertedPayment.country
+      }
+    }))
+    
+    toast({
+      title: "Payment Details Loaded",
+      description: `Loaded payment method ending in ${savedPayment.card_number}`,
+    })
   }
 
   const formatDate = (year: string, month: string, day: string) => {
@@ -274,6 +346,43 @@ export default function BookingPage() {
       const booking = await bookingsApiService.createBooking(bookingData)
 
       if (booking) {
+        // Save passenger and payment details for future use
+        try {
+          // Save first passenger as primary
+          if (bookingForm.passengers[0]) {
+            const passengerData = {
+              first_name: bookingForm.passengers[0].firstName,
+              last_name: bookingForm.passengers[0].lastName,
+              date_of_birth: bookingForm.passengers[0].dateOfBirth,
+              passport_number: bookingForm.passengers[0].passportNumber,
+              email: bookingForm.passengers[0].email,
+              phone: bookingForm.passengers[0].phone,
+              seat_preference: bookingForm.passengers[0].seatPreference,
+              special_requests: bookingForm.passengers[0].specialRequests,
+              is_primary: true
+            }
+            await savedDetailsApiService.savePassenger(passengerData)
+          }
+
+          // Save payment method as default
+          const paymentData = {
+            card_number: bookingForm.payment.cardNumber,
+            card_holder_name: bookingForm.payment.cardHolderName,
+            expiry_month: bookingForm.payment.expiryMonth,
+            expiry_year: bookingForm.payment.expiryYear,
+            billing_address: bookingForm.payment.billingAddress,
+            city: bookingForm.payment.city,
+            state: bookingForm.payment.state,
+            zip_code: bookingForm.payment.zipCode,
+            country: bookingForm.payment.country,
+            is_default: true
+          }
+          await savedDetailsApiService.savePayment(paymentData)
+        } catch (error) {
+          console.error('Error saving details:', error)
+          // Don't fail the booking if saving details fails
+        }
+
         toast({
           title: "Booking Successful!",
           description: `Your booking reference is ${booking.bookingRef}. Check your email for confirmation.`,
@@ -468,7 +577,32 @@ export default function BookingPage() {
             {bookingForm.passengers.map((passenger, index) => (
               <Card key={index}>
                 <CardHeader>
-                  <CardTitle>Passenger {index + 1}</CardTitle>
+                  <div className="flex items-center justify-between">
+                    <CardTitle>Passenger {index + 1}</CardTitle>
+                    {savedPassengers.length > 0 && (
+                      <div className="flex items-center space-x-2">
+                        <span className="text-sm text-muted-foreground">Use saved:</span>
+                        <Select onValueChange={(value) => {
+                          const savedPassenger = savedPassengers.find(p => p.id.toString() === value)
+                          if (savedPassenger) {
+                            useSavedPassenger(savedPassenger, index)
+                          }
+                        }}>
+                          <SelectTrigger className="w-48">
+                            <SelectValue placeholder="Select saved passenger" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {savedPassengers.map(savedPassenger => (
+                              <SelectItem key={savedPassenger.id} value={savedPassenger.id.toString()}>
+                                {savedPassenger.first_name} {savedPassenger.last_name}
+                                {savedPassenger.is_primary && " (Primary)"}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+                  </div>
                 </CardHeader>
                 <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
@@ -561,10 +695,35 @@ export default function BookingPage() {
             {/* Payment Information */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center">
-                  <CreditCard className="mr-2 h-5 w-5" />
-                  Payment Information
-                </CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center">
+                    <CreditCard className="mr-2 h-5 w-5" />
+                    Payment Information
+                  </CardTitle>
+                  {savedPayments.length > 0 && (
+                    <div className="flex items-center space-x-2">
+                      <span className="text-sm text-muted-foreground">Use saved:</span>
+                      <Select onValueChange={(value) => {
+                        const savedPayment = savedPayments.find(p => p.id.toString() === value)
+                        if (savedPayment) {
+                          useSavedPayment(savedPayment)
+                        }
+                      }}>
+                        <SelectTrigger className="w-48">
+                          <SelectValue placeholder="Select saved payment" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {savedPayments.map(savedPayment => (
+                            <SelectItem key={savedPayment.id} value={savedPayment.id.toString()}>
+                              {savedPayment.card_holder_name} (****{savedPayment.card_number})
+                              {savedPayment.is_default && " (Default)"}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+                </div>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
