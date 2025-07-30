@@ -68,9 +68,24 @@ class SavedDetailsApiService {
   // Saved Passengers
   async getSavedPassengers(): Promise<SavedPassenger[]> {
     try {
+      const token = localStorage.getItem('access_token')
+      if (!token) {
+        console.warn('No access token found. User must be logged in to view saved passengers.')
+        return []
+      }
+
       const response = await fetch(`${API_BASE_URL}/api/user/saved-passengers`, {
         headers: this.getAuthHeaders()
       })
+
+      if (response.status === 401) {
+        console.warn('Authentication failed. Please log in again.')
+        // Clear invalid token
+        localStorage.removeItem('access_token')
+        localStorage.removeItem('refresh_token')
+        localStorage.removeItem('user')
+        return []
+      }
 
       if (!response.ok) {
         throw new Error(`Failed to fetch saved passengers: ${response.status}`)
@@ -142,9 +157,24 @@ class SavedDetailsApiService {
   // Saved Payments
   async getSavedPayments(): Promise<SavedPayment[]> {
     try {
+      const token = localStorage.getItem('access_token')
+      if (!token) {
+        console.warn('No access token found. User must be logged in to view saved payments.')
+        return []
+      }
+
       const response = await fetch(`${API_BASE_URL}/api/user/saved-payments`, {
         headers: this.getAuthHeaders()
       })
+
+      if (response.status === 401) {
+        console.warn('Authentication failed. Please log in again.')
+        // Clear invalid token
+        localStorage.removeItem('access_token')
+        localStorage.removeItem('refresh_token')
+        localStorage.removeItem('user')
+        return []
+      }
 
       if (!response.ok) {
         throw new Error(`Failed to fetch saved payments: ${response.status}`)
