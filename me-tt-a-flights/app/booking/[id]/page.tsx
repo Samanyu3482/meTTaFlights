@@ -15,7 +15,8 @@ import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/components/auth-provider"
 import { Flight } from "@/lib/api"
-import { bookingsService, PassengerInfo, PaymentInfo } from "@/lib/bookings"
+import { bookingsApiService, CreateBookingRequest } from "@/lib/bookings-api"
+import { PassengerInfo, PaymentInfo } from "@/lib/bookings"
 import { 
   Plane, 
   CreditCard, 
@@ -227,31 +228,65 @@ export default function BookingPage() {
     setSubmitting(true)
 
     try {
-      // Simulate API call for booking
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      // Transform frontend data to backend format
+      const bookingData: CreateBookingRequest = {
+        flight: {
+          year: flight!.year,
+          month: flight!.month,
+          day: flight!.day,
+          source: flight!.source,
+          destination: flight!.destination,
+          cost: flight!.cost,
+          takeoff: flight!.takeoff,
+          landing: flight!.landing,
+          duration: flight!.duration,
+          is_connecting: flight!.is_connecting,
+          connection_airport: flight!.connection_airport,
+          layover_hours: flight!.layover_hours,
+          airline: flight!.airline
+        },
+        passengers: bookingForm.passengers.map(passenger => ({
+          first_name: passenger.firstName,
+          last_name: passenger.lastName,
+          date_of_birth: passenger.dateOfBirth,
+          passport_number: passenger.passportNumber,
+          email: passenger.email,
+          phone: passenger.phone,
+          seat_preference: passenger.seatPreference,
+          special_requests: passenger.specialRequests
+        })),
+        payment: {
+          card_number: bookingForm.payment.cardNumber,
+          card_holder_name: bookingForm.payment.cardHolderName,
+          expiry_month: bookingForm.payment.expiryMonth,
+          expiry_year: bookingForm.payment.expiryYear,
+          cvv: bookingForm.payment.cvv,
+          billing_address: bookingForm.payment.billingAddress,
+          city: bookingForm.payment.city,
+          state: bookingForm.payment.state,
+          zip_code: bookingForm.payment.zipCode,
+          country: bookingForm.payment.country
+        },
+        passenger_count: passengerCount
+      }
 
-      // Create booking using the bookings service
-      const booking = bookingsService.createBooking(
-        user.id,
-        flight!,
-        bookingForm.passengers,
-        bookingForm.payment,
-        passengerCount
-      )
+      // Create booking using the API service
+      const booking = await bookingsApiService.createBooking(bookingData)
 
-      // Save the booking
-      bookingsService.addBooking(booking)
+      if (booking) {
+        toast({
+          title: "Booking Successful!",
+          description: `Your booking reference is ${booking.bookingRef}. Check your email for confirmation.`,
+        })
 
-      toast({
-        title: "Booking Successful!",
-        description: `Your booking reference is ${booking.bookingRef}. Check your email for confirmation.`,
-      })
+        // Clear selected flight from localStorage
+        localStorage.removeItem('selectedFlight')
 
-      // Clear selected flight from localStorage
-      localStorage.removeItem('selectedFlight')
-
-      // Redirect to trips page
-      router.push('/trips')
+        // Redirect to trips page
+        router.push('/trips')
+      } else {
+        throw new Error('Failed to create booking')
+      }
     } catch (error) {
       toast({
         title: "Booking Failed",

@@ -8,7 +8,8 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { useAuth } from "@/components/auth-provider"
-import { bookingsService, Booking } from "@/lib/bookings"
+import { bookingsApiService } from "@/lib/bookings-api"
+import { Booking } from "@/lib/bookings"
 import { Plane, Calendar, MapPin, Clock, Download, Share, AlertCircle, CheckCircle, XCircle, Trash2, Settings, Globe, Compass, Map } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -36,34 +37,40 @@ export default function TripsPage() {
 
   // Load user bookings
   useEffect(() => {
-    if (user) {
-      const userBookings = bookingsService.getUserBookings(user.id)
-      setBookings(userBookings)
+    const loadBookings = async () => {
+      if (user) {
+        setLoading(true)
+        try {
+          const userBookings = await bookingsApiService.getUserBookings()
+          setBookings(userBookings)
+        } catch (error) {
+          console.error('Error loading bookings:', error)
+        } finally {
+          setLoading(false)
+        }
+      } else {
+        setLoading(false)
+      }
     }
-    setLoading(false)
+    
+    loadBookings()
   }, [user])
 
   // Refresh bookings when component mounts (useful after booking completion)
   useEffect(() => {
-    const refreshBookings = () => {
+    const refreshBookings = async () => {
       if (user) {
-        const userBookings = bookingsService.getUserBookings(user.id)
-        setBookings(userBookings)
+        try {
+          const userBookings = await bookingsApiService.getUserBookings()
+          setBookings(userBookings)
+        } catch (error) {
+          console.error('Error refreshing bookings:', error)
+        }
       }
     }
 
     // Refresh on mount
     refreshBookings()
-
-    // Listen for storage changes (in case bookings are added from another tab)
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'userBookings') {
-        refreshBookings()
-      }
-    }
-
-    window.addEventListener('storage', handleStorageChange)
-    return () => window.removeEventListener('storage', handleStorageChange)
   }, [user])
 
   if (!user) {
@@ -121,12 +128,16 @@ export default function TripsPage() {
 
   const handleRemoveBooking = async (bookingId: string) => {
     try {
-      bookingsService.deleteBooking(bookingId)
-      setBookings(bookings.filter(booking => booking.id !== bookingId))
-      toast({
-        title: "Booking removed",
-        description: "Your booking has been removed successfully.",
-      })
+      const success = await bookingsApiService.deleteBooking(bookingId)
+      if (success) {
+        setBookings(bookings.filter(booking => booking.id !== bookingId))
+        toast({
+          title: "Booking removed",
+          description: "Your booking has been removed successfully.",
+        })
+      } else {
+        throw new Error('Failed to delete booking')
+      }
     } catch (error) {
       toast({
         title: "Error removing booking",
