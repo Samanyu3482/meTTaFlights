@@ -12,7 +12,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useAuth } from "@/components/auth-provider"
 import { useToast } from "@/hooks/use-toast"
-import { User, Mail, Phone, MapPin, Calendar, Award, Plane, Settings, Camera } from "lucide-react"
+import { savedDetailsApiService, SavedPassenger, SavedPayment } from "@/lib/saved-details-api"
+import { User, Mail, Phone, MapPin, Calendar, Award, Plane, Settings, Camera, Users, CreditCard, Plus, Edit, Trash2 } from "lucide-react"
 import Link from "next/link"
 
 export default function ProfilePage() {
@@ -29,6 +30,9 @@ export default function ProfilePage() {
     address: "",
     emergency_contact: "",
   })
+  const [savedPassengers, setSavedPassengers] = useState<SavedPassenger[]>([])
+  const [savedPayments, setSavedPayments] = useState<SavedPayment[]>([])
+  const [loadingSavedDetails, setLoadingSavedDetails] = useState(false)
 
   useEffect(() => {
     if (user) {
@@ -42,6 +46,29 @@ export default function ProfilePage() {
         emergency_contact: user.emergency_contact || "",
       })
     }
+  }, [user])
+
+  // Load saved passengers and payments
+  useEffect(() => {
+    const loadSavedDetails = async () => {
+      if (user) {
+        setLoadingSavedDetails(true)
+        try {
+          const [passengers, payments] = await Promise.all([
+            savedDetailsApiService.getSavedPassengers(),
+            savedDetailsApiService.getSavedPayments()
+          ])
+          setSavedPassengers(passengers)
+          setSavedPayments(payments)
+        } catch (error) {
+          console.error('Error loading saved details:', error)
+        } finally {
+          setLoadingSavedDetails(false)
+        }
+      }
+    }
+
+    loadSavedDetails()
   }, [user])
 
   if (!user) {
@@ -168,8 +195,9 @@ export default function ProfilePage() {
 
         {/* Profile Content */}
         <Tabs defaultValue="personal" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="personal">Personal Info</TabsTrigger>
+            <TabsTrigger value="saved">Saved Details</TabsTrigger>
             <TabsTrigger value="travel">Travel Preferences</TabsTrigger>
             <TabsTrigger value="loyalty">Loyalty Program</TabsTrigger>
             <TabsTrigger value="security">Security</TabsTrigger>
@@ -304,6 +332,152 @@ export default function ProfilePage() {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="saved" className="mt-6">
+            <div className="space-y-6">
+              {/* Saved Passengers */}
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="flex items-center">
+                      <Users className="mr-2 h-5 w-5" />
+                      Saved Passengers
+                    </CardTitle>
+                    <Button size="sm" variant="outline">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Passenger
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {loadingSavedDetails ? (
+                    <div className="text-center py-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                      <p className="text-muted-foreground mt-2">Loading saved passengers...</p>
+                    </div>
+                  ) : savedPassengers.length === 0 ? (
+                    <div className="text-center py-8">
+                      <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                      <p className="text-muted-foreground mb-4">No saved passengers yet</p>
+                      <p className="text-sm text-muted-foreground">Your passenger details will be saved automatically after your first booking.</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {savedPassengers.map((passenger) => (
+                        <div key={passenger.id} className="flex items-center justify-between p-4 border rounded-lg">
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-2">
+                              <h4 className="font-semibold">{passenger.first_name} {passenger.last_name}</h4>
+                              {passenger.is_primary && (
+                                <Badge variant="secondary" className="text-xs">Primary</Badge>
+                              )}
+                            </div>
+                            <p className="text-sm text-muted-foreground">{passenger.email}</p>
+                            <p className="text-sm text-muted-foreground">Passport: {passenger.passport_number}</p>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Button size="sm" variant="outline">
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button size="sm" variant="outline" className="text-red-600 hover:text-red-700">
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Saved Payment Methods */}
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="flex items-center">
+                      <CreditCard className="mr-2 h-5 w-5" />
+                      Saved Payment Methods
+                    </CardTitle>
+                    <Button size="sm" variant="outline">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Payment Method
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {loadingSavedDetails ? (
+                    <div className="text-center py-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                      <p className="text-muted-foreground mt-2">Loading saved payments...</p>
+                    </div>
+                  ) : savedPayments.length === 0 ? (
+                    <div className="text-center py-8">
+                      <CreditCard className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                      <p className="text-muted-foreground mb-4">No saved payment methods yet</p>
+                      <p className="text-sm text-muted-foreground">Your payment methods will be saved automatically after your first booking.</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {savedPayments.map((payment) => (
+                        <div key={payment.id} className="flex items-center justify-between p-4 border rounded-lg">
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-2">
+                              <h4 className="font-semibold">{payment.card_holder_name}</h4>
+                              {payment.is_default && (
+                                <Badge variant="secondary" className="text-xs">Default</Badge>
+                              )}
+                            </div>
+                            <p className="text-sm text-muted-foreground">**** **** **** {payment.card_number}</p>
+                            <p className="text-sm text-muted-foreground">Expires: {payment.expiry_month}/{payment.expiry_year}</p>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Button size="sm" variant="outline">
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button size="sm" variant="outline" className="text-red-600 hover:text-red-700">
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* How to Use */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>How to Use Saved Details</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-start space-x-3">
+                      <div className="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold">1</div>
+                      <div>
+                        <h4 className="font-semibold">Automatic Saving</h4>
+                        <p className="text-sm text-muted-foreground">Your passenger and payment details are automatically saved after each successful booking.</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <div className="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold">2</div>
+                      <div>
+                        <h4 className="font-semibold">Quick Booking</h4>
+                        <p className="text-sm text-muted-foreground">When booking a flight, use the dropdown menus to quickly fill in saved passenger and payment details.</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <div className="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold">3</div>
+                      <div>
+                        <h4 className="font-semibold">Manage Details</h4>
+                        <p className="text-sm text-muted-foreground">Edit or remove saved details from this page anytime. Primary passengers and default payment methods are marked.</p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
 
           <TabsContent value="travel" className="mt-6">
