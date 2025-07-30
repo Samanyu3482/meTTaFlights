@@ -192,9 +192,24 @@ class BookingsApiService {
   // Get all bookings for a user
   async getUserBookings(): Promise<Booking[]> {
     try {
+      const token = localStorage.getItem('access_token')
+      if (!token) {
+        console.warn('No access token found. User must be logged in to view bookings.')
+        return []
+      }
+
       const response = await fetch(`${API_BASE_URL}/api/bookings`, {
         headers: this.getAuthHeaders()
       })
+
+      if (response.status === 401) {
+        console.warn('Authentication failed. Please log in again.')
+        // Clear invalid token
+        localStorage.removeItem('access_token')
+        localStorage.removeItem('refresh_token')
+        localStorage.removeItem('user')
+        return []
+      }
 
       if (!response.ok) {
         throw new Error(`Failed to fetch bookings: ${response.status}`)
@@ -211,21 +226,37 @@ class BookingsApiService {
   // Create a new booking
   async createBooking(bookingData: CreateBookingRequest): Promise<Booking | null> {
     try {
+      const token = localStorage.getItem('access_token')
+      if (!token) {
+        console.error('No access token found. User must be logged in to create bookings.')
+        throw new Error('Authentication required. Please log in first.')
+      }
+
       const response = await fetch(`${API_BASE_URL}/api/bookings`, {
         method: 'POST',
         headers: this.getAuthHeaders(),
         body: JSON.stringify(bookingData)
       })
 
+      if (response.status === 401) {
+        console.error('Authentication failed. Please log in again.')
+        // Clear invalid token
+        localStorage.removeItem('access_token')
+        localStorage.removeItem('refresh_token')
+        localStorage.removeItem('user')
+        throw new Error('Authentication failed. Please log in again.')
+      }
+
       if (!response.ok) {
-        throw new Error(`Failed to create booking: ${response.status}`)
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.detail || `Failed to create booking: ${response.status}`)
       }
 
       const apiBooking: BookingApiResponse = await response.json()
       return this.convertApiResponseToBooking(apiBooking)
     } catch (error) {
       console.error('Error creating booking:', error)
-      return null
+      throw error
     }
   }
 
