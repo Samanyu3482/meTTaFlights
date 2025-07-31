@@ -2,12 +2,13 @@
   "metadata": {
     "total_flights": 49999,
     "unique_routes": 208,
-    "mapped_routes": 208,
+    "mapped_routes": 220,
     "coverage_percentage": 100.0,
     "multi_airline_routes": 201,
     "single_airline_routes": 7,
-    "version": "4.0",
-    "description": "Complete multi-airline mapping covering all routes in flights.metta with realistic competition"
+    "version": "4.0.1",
+    "description": "Complete multi-airline mapping covering all routes in flights.metta with realistic competition (Updated with missing routes)",
+    "total_routes": 220
   },
   "airlines": {
     "AA": {
@@ -2374,6 +2375,102 @@
       "frequencies": {
         "AA": 0.6,
         "DL": 0.4
+      }
+    },
+    "ATL-LAX": {
+      "airlines": [
+        "DL"
+      ],
+      "frequencies": {
+        "DL": 1.0
+      }
+    },
+    "ORD-SFO": {
+      "airlines": [
+        "AA"
+      ],
+      "frequencies": {
+        "AA": 1.0
+      }
+    },
+    "DEN-SEA": {
+      "airlines": [
+        "UA"
+      ],
+      "frequencies": {
+        "UA": 1.0
+      }
+    },
+    "PHX-BUR": {
+      "airlines": [
+        "AA"
+      ],
+      "frequencies": {
+        "AA": 1.0
+      }
+    },
+    "LAS-SFO": {
+      "airlines": [
+        "WN"
+      ],
+      "frequencies": {
+        "WN": 1.0
+      }
+    },
+    "MIA-SJU": {
+      "airlines": [
+        "AA"
+      ],
+      "frequencies": {
+        "AA": 1.0
+      }
+    },
+    "DFW-LAX": {
+      "airlines": [
+        "AA"
+      ],
+      "frequencies": {
+        "AA": 1.0
+      }
+    },
+    "LAS-BUR": {
+      "airlines": [
+        "WN"
+      ],
+      "frequencies": {
+        "WN": 1.0
+      }
+    },
+    "CLT-MSP": {
+      "airlines": [
+        "AA"
+      ],
+      "frequencies": {
+        "AA": 1.0
+      }
+    },
+    "MCO-FLL": {
+      "airlines": [
+        "WN"
+      ],
+      "frequencies": {
+        "WN": 1.0
+      }
+    },
+    "MIA-TPA": {
+      "airlines": [
+        "AA"
+      ],
+      "frequencies": {
+        "AA": 1.0
+      }
+    },
+    "ORD-MSP": {
+      "airlines": [
+        "AA"
+      ],
+      "frequencies": {
+        "AA": 1.0
       }
     }
   },
