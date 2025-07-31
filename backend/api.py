@@ -8,14 +8,23 @@ from dotenv import load_dotenv
 
 # Import our modules
 from database.database import get_db, create_tables
-from models.user import User, UserSession, SearchHistory, FavoriteRoute
+from models.user import User, UserSession, SearchHistory, FavoriteRoute, SavedPassenger, SavedPayment
+from models.booking import Booking, Passenger, Payment
 from schemas.auth_schemas import (
     UserRegisterRequest, UserLoginRequest, UserProfileUpdateRequest,
     UserResponse, AuthResponse, TokenResponse, MessageResponse,
     SearchHistoryRequest, SearchHistoryResponse,
-    FavoriteRouteRequest, FavoriteRouteResponse
+    FavoriteRouteRequest, FavoriteRouteResponse,
+    SavedPassengerRequest, SavedPassengerResponse,
+    SavedPaymentRequest, SavedPaymentResponse
+)
+from schemas.booking_schemas import (
+    CreateBookingRequest, BookingResponse, BookingListResponse,
+    UpdateBookingStatusRequest
 )
 from services.auth_service import auth_service
+from services.booking_service import booking_service
+from services.saved_details_service import saved_details_service
 from services.dependencies import get_current_user, get_current_user_optional
 
 load_dotenv()
@@ -355,6 +364,331 @@ async def delete_favorite_route(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to delete favorite route: {str(e)}"
+        )
+
+# Saved details endpoints
+@app.post("/api/user/saved-passengers", response_model=SavedPassengerResponse)
+async def add_saved_passenger(
+    passenger_data: SavedPassengerRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Add a saved passenger"""
+    try:
+        saved_passenger = saved_details_service.save_passenger(db, current_user.id, passenger_data)
+        if not saved_passenger:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to save passenger"
+            )
+        return SavedPassengerResponse.from_orm(saved_passenger)
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to add saved passenger: {str(e)}"
+        )
+
+@app.get("/api/user/saved-passengers", response_model=list[SavedPassengerResponse])
+async def get_saved_passengers(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get user's saved passengers"""
+    try:
+        passengers = saved_details_service.get_user_saved_passengers(db, current_user.id)
+        return [SavedPassengerResponse.from_orm(passenger) for passenger in passengers]
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get saved passengers: {str(e)}"
+        )
+
+@app.put("/api/user/saved-passengers/{passenger_id}", response_model=SavedPassengerResponse)
+async def update_saved_passenger(
+    passenger_id: int,
+    passenger_data: SavedPassengerRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Update a saved passenger"""
+    try:
+        saved_passenger = saved_details_service.update_saved_passenger(db, passenger_id, current_user.id, passenger_data)
+        if not saved_passenger:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Saved passenger not found"
+            )
+        return SavedPassengerResponse.from_orm(saved_passenger)
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to update saved passenger: {str(e)}"
+        )
+
+@app.delete("/api/user/saved-passengers/{passenger_id}", response_model=MessageResponse)
+async def delete_saved_passenger(
+    passenger_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Delete a saved passenger"""
+    try:
+        success = saved_details_service.delete_saved_passenger(db, passenger_id, current_user.id)
+        if not success:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Saved passenger not found"
+            )
+        return MessageResponse(message="Saved passenger deleted successfully")
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to delete saved passenger: {str(e)}"
+        )
+
+@app.post("/api/user/saved-payments", response_model=SavedPaymentResponse)
+async def add_saved_payment(
+    payment_data: SavedPaymentRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Add a saved payment"""
+    try:
+        saved_payment = saved_details_service.save_payment(db, current_user.id, payment_data)
+        if not saved_payment:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to save payment"
+            )
+        return SavedPaymentResponse.from_orm(saved_payment)
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to add saved payment: {str(e)}"
+        )
+
+@app.get("/api/user/saved-payments", response_model=list[SavedPaymentResponse])
+async def get_saved_payments(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get user's saved payments"""
+    try:
+        payments = saved_details_service.get_user_saved_payments(db, current_user.id)
+        return [SavedPaymentResponse.from_orm(payment) for payment in payments]
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get saved payments: {str(e)}"
+        )
+
+@app.put("/api/user/saved-payments/{payment_id}", response_model=SavedPaymentResponse)
+async def update_saved_payment(
+    payment_id: int,
+    payment_data: SavedPaymentRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Update a saved payment"""
+    try:
+        saved_payment = saved_details_service.update_saved_payment(db, payment_id, current_user.id, payment_data)
+        if not saved_payment:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Saved payment not found"
+            )
+        return SavedPaymentResponse.from_orm(saved_payment)
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to update saved payment: {str(e)}"
+        )
+
+@app.delete("/api/user/saved-payments/{payment_id}", response_model=MessageResponse)
+async def delete_saved_payment(
+    payment_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Delete a saved payment"""
+    try:
+        success = saved_details_service.delete_saved_payment(db, payment_id, current_user.id)
+        if not success:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Saved payment not found"
+            )
+        return MessageResponse(message="Saved payment deleted successfully")
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to delete saved payment: {str(e)}"
+        )
+
+# Booking endpoints
+@app.post("/api/bookings", response_model=BookingResponse)
+async def create_booking(
+    booking_data: CreateBookingRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Create a new booking"""
+    try:
+        booking = booking_service.create_booking(db, current_user.id, booking_data)
+        if not booking:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to create booking"
+            )
+        return BookingResponse.from_orm(booking)
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Booking creation failed: {str(e)}"
+        )
+
+@app.get("/api/bookings", response_model=BookingListResponse)
+async def get_user_bookings(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get all bookings for the current user"""
+    try:
+        bookings = booking_service.get_user_bookings(db, current_user.id)
+        return BookingListResponse(
+            bookings=[BookingResponse.from_orm(booking) for booking in bookings],
+            total=len(bookings),
+            page=1,
+            per_page=len(bookings)
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get bookings: {str(e)}"
+        )
+
+@app.get("/api/bookings/{booking_id}", response_model=BookingResponse)
+async def get_booking(
+    booking_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get a specific booking by ID"""
+    try:
+        booking = booking_service.get_booking_by_id(db, booking_id, current_user.id)
+        if not booking:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Booking not found"
+            )
+        return BookingResponse.from_orm(booking)
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get booking: {str(e)}"
+        )
+
+@app.put("/api/bookings/{booking_id}/status", response_model=BookingResponse)
+async def update_booking_status(
+    booking_id: int,
+    status_data: UpdateBookingStatusRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Update booking status"""
+    try:
+        booking = booking_service.update_booking_status(db, booking_id, current_user.id, status_data)
+        if not booking:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Booking not found"
+            )
+        return BookingResponse.from_orm(booking)
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to update booking status: {str(e)}"
+        )
+
+@app.delete("/api/bookings/{booking_id}", response_model=MessageResponse)
+async def delete_booking(
+    booking_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Delete a booking"""
+    try:
+        success = booking_service.delete_booking(db, booking_id, current_user.id)
+        if not success:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Booking not found"
+            )
+        return MessageResponse(message="Booking deleted successfully")
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to delete booking: {str(e)}"
+        )
+
+@app.get("/api/bookings/upcoming", response_model=BookingListResponse)
+async def get_upcoming_bookings(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get upcoming bookings for the current user"""
+    try:
+        bookings = booking_service.get_upcoming_bookings(db, current_user.id)
+        return BookingListResponse(
+            bookings=[BookingResponse.from_orm(booking) for booking in bookings],
+            total=len(bookings),
+            page=1,
+            per_page=len(bookings)
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get upcoming bookings: {str(e)}"
+        )
+
+@app.get("/api/bookings/completed", response_model=BookingListResponse)
+async def get_completed_bookings(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get completed bookings for the current user"""
+    try:
+        bookings = booking_service.get_completed_bookings(db, current_user.id)
+        return BookingListResponse(
+            bookings=[BookingResponse.from_orm(booking) for booking in bookings],
+            total=len(bookings),
+            page=1,
+            per_page=len(bookings)
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get completed bookings: {str(e)}"
         )
 
 if __name__ == "__main__":
