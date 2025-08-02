@@ -1,12 +1,21 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
 import httpx
 import asyncio
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 import requests
+from schemas.flight_schemas import (
+    FlightSearchRequest, FlightSearchResponse, FlightDetails, 
+    AirlineInfo, PriorityType, CabinClass, PassengerInfo
+)
+from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPBearer
+import jwt
+from datetime import datetime, timedelta
+import os
+from services.user_service import user_service
 
 app = FastAPI(
     title="Cheapest Flight Search API",
@@ -23,35 +32,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Pydantic models
-class FlightSearchRequest(BaseModel):
-    source: str
-    destination: str
-    day: int
-    month: int
-    year: int
-    passengers: int = 1
-
-class Flight(BaseModel):
-    id: str
-    airline: str
-    flight_number: str
-    departure_time: str
-    arrival_time: str
-    duration: str
-    price: float
-    stops: int
-    departure_airport: str
-    arrival_airport: str
-    aircraft: Optional[str] = None
-    cabin_class: str = "economy"
+# Service class for cheapest flight search
 
 class CheapestFlightService:
     def __init__(self):
         # Connect to your existing search API
         self.search_api_url = "http://localhost:8000"  # Your project copy API
     
-    async def search_cheapest_flight(self, request: FlightSearchRequest) -> Dict[str, Any]:
+    async def search_cheapest_flight(self, request: FlightSearchRequest) -> FlightSearchResponse:
         """Search for flights and return the cheapest one"""
         
         start_time = datetime.now()
@@ -64,44 +52,61 @@ class CheapestFlightService:
             search_response = await self._call_search_api(request.source, request.destination, date_str, request.passengers)
             
             if not search_response or not search_response.get('flights'):
-                return {
-                    "success": False,
-                    "message": "No flights found for the given criteria",
-                    "cheapest_flight": None,
-                    "total_flights": 0
-                }
+                return FlightSearchResponse(
+                    success=False,
+                    message="No flights found for the given criteria",
+                    flight=None,
+                    total_flights=0,
+                    search_time_ms=(datetime.now() - start_time).total_seconds() * 1000,
+                    priority_type=PriorityType.CHEAPEST,
+                    source=request.source,
+                    destination=request.destination,
+                    search_date=date_str
+                )
             
             # Find the cheapest flight from results
             flights = search_response['flights']
             cheapest_flight = self._find_cheapest_flight(flights)
             
             if not cheapest_flight:
-                return {
-                    "success": False,
-                    "message": "No flights available",
-                    "cheapest_flight": None,
-                    "total_flights": len(flights)
-                }
+                return FlightSearchResponse(
+                    success=False,
+                    message="No flights available",
+                    flight=None,
+                    total_flights=len(flights),
+                    search_time_ms=(datetime.now() - start_time).total_seconds() * 1000,
+                    priority_type=PriorityType.CHEAPEST,
+                    source=request.source,
+                    destination=request.destination,
+                    search_date=date_str
+                )
             
             search_time_ms = (datetime.now() - start_time).total_seconds() * 1000
             
-            return {
-                "success": True,
-                "message": f"Found cheapest flight: {cheapest_flight['airline_name']} for ${cheapest_flight['cost']}",
-                "cheapest_flight": cheapest_flight,
-                "total_flights": len(flights),
-                "search_time_ms": search_time_ms,
-                "source": request.source,
-                "destination": request.destination
-            }
+            return FlightSearchResponse(
+                success=True,
+                message=f"Found cheapest flight: {cheapest_flight.airline.name} for ${cheapest_flight.cost}",
+                flight=cheapest_flight,
+                total_flights=len(flights),
+                search_time_ms=search_time_ms,
+                priority_type=PriorityType.CHEAPEST,
+                source=request.source,
+                destination=request.destination,
+                search_date=date_str
+            )
             
         except Exception as e:
-            return {
-                "success": False,
-                "message": f"Error processing request: {str(e)}",
-                "cheapest_flight": None,
-                "total_flights": 0
-            }
+            return FlightSearchResponse(
+                success=False,
+                message=f"Error processing request: {str(e)}",
+                flight=None,
+                total_flights=0,
+                search_time_ms=(datetime.now() - start_time).total_seconds() * 1000,
+                priority_type=PriorityType.CHEAPEST,
+                source=request.source,
+                destination=request.destination,
+                search_date=date_str
+            )
     
     async def _call_search_api(self, source: str, destination: str, date: str, passengers: int) -> Dict[str, Any]:
         """Call your existing search API"""
@@ -134,7 +139,7 @@ class CheapestFlightService:
             except httpx.HTTPStatusError as e:
                 raise Exception(f"Search API error: {e.response.text}")
     
-    def _find_cheapest_flight(self, flights: List[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+    def _find_cheapest_flight(self, flights: List[Dict[str, Any]]) -> Optional[FlightDetails]:
         """Find the cheapest flight from the list"""
         if not flights:
             return None
@@ -161,36 +166,98 @@ class CheapestFlightService:
         # Get airline information from the flight data
         airline_info = cheapest.get('airline', {})
         
-        # Convert to unified format
-        return {
+        # Calculate fare breakdown
+        cost = float(cheapest.get('cost', 0))
+        base_fare = cost * 0.85  # 85% base fare, 15% taxes
+        taxes = cost * 0.15
+        
+        # Create airline info object
+        airline = AirlineInfo(
+            code=airline_info.get('code', 'Unknown'),
+            name=airline_info.get('name', 'Unknown Airline'),
+            logo=airline_info.get('logo', ''),
+            description=airline_info.get('description', '')
+        )
+        
+        # Convert to unified FlightDetails format using REAL data from project copy API
+        flight_data = {
             "id": f"flight_{cheapest.get('source', '')}_{cheapest.get('destination', '')}_{cheapest.get('year', '')}_{cheapest.get('month', '')}_{cheapest.get('day', '')}",
             "source": cheapest.get('source', ''),
             "destination": cheapest.get('destination', ''),
             "year": cheapest.get('year', ''),
             "month": cheapest.get('month', ''),
             "day": cheapest.get('day', ''),
-            "takeoff": cheapest.get('takeoff', ''),
-            "landing": cheapest.get('landing', ''),
-            "duration": duration_str,
-            "duration_minutes": duration_minutes,
-            "cost": cheapest.get('cost', ''),
-            "airline": airline_info.get('code', 'Unknown'),
-            "airline_name": airline_info.get('name', 'Unknown Airline'),
-            "airline_logo": airline_info.get('logo', ''),
-            "airline_description": airline_info.get('description', ''),
-            "flight_number": f"{airline_info.get('code', 'XX')}123",
-            "stops": cheapest.get('stops', 0),
             "departure_time": cheapest.get('takeoff', ''),
             "arrival_time": cheapest.get('landing', ''),
+            "duration": duration_str,
+            "duration_minutes": duration_minutes,
+            "cost": cost,
+            "currency": "USD",
+            "base_fare": base_fare,
+            "taxes": taxes,
+            "total_fare": cost,
+            "airline": airline,
+            "flight_number": f"{airline_info.get('code', 'XX')}123",
+            "stops": cheapest.get('stops', 0),
             "is_connecting": cheapest.get('is_connecting', False),
             "connection_airport": cheapest.get('connection_airport', ''),
             "layover_hours": cheapest.get('layover_hours', 0),
             "aircraft": "Boeing 737",
-            "cabin_class": "economy"
+            "cabin_class": CabinClass.ECONOMY,
+            "available_seats": 50,
+            "seat_class": "Economy",
+            "baggage_allowance": {"checked": 1, "carry_on": 1},
+            "refund_policy": "Non-refundable",
+            "change_policy": "Change fee applies",
+            "meal_included": True,
+            "entertainment": True,
+            "wifi_available": False,
+            "power_outlets": True,
+            "booking_class": "Y",
+            "fare_basis": "YOW",
+            "ticket_type": "Electronic",
+            "search_timestamp": datetime.now(),
+            "valid_until": datetime.now() + timedelta(hours=24)
         }
+        
+        return FlightDetails(**flight_data)
 
 # Initialize service
 cheapest_service = CheapestFlightService()
+
+# JWT token handling
+SECRET_KEY = os.getenv("SECRET_KEY", "your-super-secret-key-change-this-in-production")
+ALGORITHM = "HS256"
+security = HTTPBearer()
+
+async def get_current_user(token: str = Depends(security)):
+    """Get current user from JWT token"""
+    try:
+        payload = jwt.decode(token.credentials, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id: str = payload.get("sub")
+        if user_id is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Could not validate credentials",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        return {"user_id": user_id, "token": token.credentials}
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token has expired",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    except jwt.PyJWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+async def get_user_passenger_info(user_id: str, token: str) -> PassengerInfo:
+    """Get passenger information for the current user from backend database"""
+    return await user_service.get_user_passenger_info(user_id, token)
 
 @app.get("/")
 async def root():
@@ -200,17 +267,30 @@ async def root():
         "version": "1.0.0",
         "status": "healthy",
         "integrated_apis": {
-            "search_api": "http://localhost:8000"
+            "search_api": "http://localhost:8000",
+            "auth_api": "http://localhost:8001"
         }
     }
 
 @app.post("/api/cheapest/search")
-async def search_cheapest_flight(request: FlightSearchRequest):
+async def search_cheapest_flight(
+    request: FlightSearchRequest,
+    current_user: dict = Depends(get_current_user)
+):
     """
-    Search for flights and return the cheapest one
+    Search for flights and return the cheapest one with user information
     """
     try:
+        # Get user passenger information
+        user_passenger = await get_user_passenger_info(current_user["user_id"], current_user["token"])
+        
+        # Search for flights
         result = await cheapest_service.search_cheapest_flight(request)
+        
+        # Add user passenger information to the response
+        if result.success and result.flight:
+            result.flight.passenger_info = user_passenger
+        
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Search failed: {str(e)}")

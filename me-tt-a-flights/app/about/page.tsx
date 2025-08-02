@@ -14,6 +14,18 @@ const teamMembers = [
     bio: "CSE-AI Student at Chitkara University, specializing in MeTTa and AI technologies",
   },
   {
+    name: "Himanshi",
+    role: "Team Member",
+    icon: User,
+    bio: "CSE-AI Student at Chitkara University, contributing to project development",
+  },
+  {
+    name: "Kriti",
+    role: "Team Member",
+    icon: User,
+    bio: "CSE-AI Student at Chitkara University, contributing to project development",
+  },
+  {
     name: "Dr. Sushil Narang",
     role: "Dean & Project Guide",
     icon: User,
@@ -224,62 +236,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Special Thanks to Parents */}
-      <section className="py-20 bg-gradient-to-r from-pink-50 to-purple-50 dark:from-gray-900 dark:to-gray-800">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center justify-center p-3 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full mb-6">
-              <Heart className="h-8 w-8 text-white" />
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
-              Special Thanks to My Parents
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              This project would not have been possible without the unwavering support, love, and guidance of my parents.
-            </p>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <Card className="text-center hover:shadow-lg transition-all duration-300 hover:scale-105 border-2 border-pink-200 dark:border-pink-800">
-              <CardContent className="p-8">
-                <div className="mx-auto w-24 h-24 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center mb-6">
-                  <GraduationCap className="h-12 w-12 text-white" />
-                </div>
-                <h3 className="text-2xl font-bold mb-2 text-blue-600 dark:text-blue-400">Dr. Vishal Gautam</h3>
-                <Badge variant="outline" className="mb-4 bg-blue-50 dark:bg-blue-900/20">
-                  My Father
-                </Badge>
-                <p className="text-muted-foreground">
-                  Thank you for your constant encouragement, wisdom, and for believing in my dreams. 
-                  Your guidance has been the foundation of my academic journey.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="text-center hover:shadow-lg transition-all duration-300 hover:scale-105 border-2 border-purple-200 dark:border-purple-800">
-              <CardContent className="p-8">
-                <div className="mx-auto w-24 h-24 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full flex items-center justify-center mb-6">
-                  <BookOpen className="h-12 w-12 text-white" />
-                </div>
-                <h3 className="text-2xl font-bold mb-2 text-purple-600 dark:text-purple-400">Dr. Bindu Sharma</h3>
-                <Badge variant="outline" className="mb-4 bg-purple-50 dark:bg-purple-900/20">
-                  My Mother
-                </Badge>
-                <p className="text-muted-foreground">
-                  Thank you for your endless love, patience, and for being my biggest supporter. 
-                  Your strength and dedication inspire me every day.
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="text-center mt-12">
-            <p className="text-lg text-muted-foreground italic">
-              "Behind every successful student, there are parents who believed in them when no one else did."
-            </p>
-          </div>
-        </div>
-      </section>
 
       {/* CTA */}
       <section className="py-20 flight-gradient text-white">

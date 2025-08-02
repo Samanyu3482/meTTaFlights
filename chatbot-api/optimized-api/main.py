@@ -7,13 +7,22 @@ Finds flights with the best balance of cost and time (optimized priority).
 import asyncio
 import json
 import argparse
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any
 import uvicorn
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 import httpx
+from schemas.flight_schemas import (
+    FlightSearchRequest, FlightSearchResponse, FlightDetails, 
+    AirlineInfo, PriorityType, CabinClass, PassengerInfo
+)
+from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPBearer
+import jwt
+from datetime import datetime, timedelta
+import os
+from services.user_service import user_service
 
 app = FastAPI(
     title="Optimized Flight Search API",
@@ -30,22 +39,41 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-class FlightSearchRequest(BaseModel):
-    source: str
-    destination: str
-    year: int
-    month: int
-    day: int
-    priority: str = "optimized"  # Always prioritize optimized balance
-    include_connections: bool = True
-    max_connections: int = 2
+# Service class for optimized flight search
 
-class OptimizedFlightResponse(BaseModel):
-    success: bool
-    message: str
-    optimized_flight: Optional[Dict[str, Any]] = None
-    total_flights: int = 0
-    search_time_ms: float = 0
+# JWT token handling
+SECRET_KEY = os.getenv("SECRET_KEY", "your-super-secret-key-change-this-in-production")
+ALGORITHM = "HS256"
+security = HTTPBearer()
+
+async def get_current_user(token: str = Depends(security)):
+    """Get current user from JWT token"""
+    try:
+        payload = jwt.decode(token.credentials, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id: str = payload.get("sub")
+        if user_id is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Could not validate credentials",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        return {"user_id": user_id, "token": token.credentials}
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token has expired",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    except jwt.PyJWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+async def get_user_passenger_info(user_id: str, token: str) -> PassengerInfo:
+    """Get passenger information for the current user from backend database"""
+    return await user_service.get_user_passenger_info(user_id, token)
 
 @app.get("/api/optimized/health")
 async def health_check():
@@ -53,13 +81,20 @@ async def health_check():
     return {
         "status": "healthy",
         "service": "Optimized Flight Search API",
-        "timestamp": datetime.now().isoformat()
+        "timestamp": datetime.now().isoformat(),
+        "integrated_apis": {
+            "search_api": "http://localhost:8000",
+            "auth_api": "http://localhost:8001"
+        }
     }
 
 @app.post("/api/optimized/search")
-async def search_optimized_flight(request: FlightSearchRequest):
+async def search_optimized_flight(
+    request: FlightSearchRequest,
+    current_user: dict = Depends(get_current_user)
+):
     """
-    Search for the optimized flight between two airports
+    Search for the optimized flight between two airports with user information
     """
     start_time = datetime.now()
     
@@ -92,11 +127,16 @@ async def search_optimized_flight(request: FlightSearchRequest):
             flights = response.json()
         
         if not flights:
-            return OptimizedFlightResponse(
+            return FlightSearchResponse(
                 success=False,
                 message=f"No flights found from {request.source} to {request.destination} on {request.day}/{request.month}/{request.year}",
+                flight=None,
                 total_flights=0,
-                search_time_ms=(datetime.now() - start_time).total_seconds() * 1000
+                search_time_ms=(datetime.now() - start_time).total_seconds() * 1000,
+                priority_type=PriorityType.OPTIMIZED,
+                source=request.source,
+                destination=request.destination,
+                search_date=f"{request.year:04d}-{request.month:02d}-{request.day:02d}"
             )
         
         # The search API already returns flights sorted by optimized priority
@@ -121,48 +161,94 @@ async def search_optimized_flight(request: FlightSearchRequest):
         # Get airline information from the flight data
         airline_info = optimized.get('airline', {})
         
-        # Convert to our expected format
-        optimized_flight = {
-            "id": f"flight_{optimized.get('source', '')}_{optimized.get('destination', '')}_{optimized.get('year', '')}_{optimized.get('month', '')}_{optimized.get('day', '')}",
-            "source": optimized.get('source', ''),
-            "destination": optimized.get('destination', ''),
-            "year": optimized.get('year', ''),
-            "month": optimized.get('month', ''),
-            "day": optimized.get('day', ''),
-            "takeoff": optimized.get('takeoff', ''),
-            "landing": optimized.get('landing', ''),
-            "duration": duration_str,
-            "duration_minutes": duration_minutes,
-            "cost": optimized.get('cost', ''),
-            "airline": airline_info.get('code', 'Unknown'),
-            "airline_name": airline_info.get('name', 'Unknown Airline'),
-            "airline_logo": airline_info.get('logo', ''),
-            "airline_description": airline_info.get('description', ''),
-            "flight_number": f"{airline_info.get('code', 'XX')}123",
-            "stops": optimized.get('stops', 0),
-            "departure_time": optimized.get('takeoff', ''),
-            "arrival_time": optimized.get('landing', ''),
-            "is_connecting": optimized.get('is_connecting', False),
-            "connection_airport": optimized.get('connection_airport', ''),
-            "layover_hours": optimized.get('layover_hours', 0)
-        }
+        # Calculate fare breakdown
+        cost = float(optimized.get('cost', 0))
+        base_fare = cost * 0.85  # 85% base fare, 15% taxes
+        taxes = cost * 0.15
+        
+        # Create airline info object
+        airline = AirlineInfo(
+            code=airline_info.get('code', 'Unknown'),
+            name=airline_info.get('name', 'Unknown Airline'),
+            logo=airline_info.get('logo', ''),
+            description=airline_info.get('description', '')
+        )
+        
+        # Convert to unified FlightDetails format
+        optimized_flight = FlightDetails(
+            id=f"flight_{optimized.get('source', '')}_{optimized.get('destination', '')}_{optimized.get('year', '')}_{optimized.get('month', '')}_{optimized.get('day', '')}",
+            source=optimized.get('source', ''),
+            destination=optimized.get('destination', ''),
+            year=optimized.get('year', ''),
+            month=optimized.get('month', ''),
+            day=optimized.get('day', ''),
+            departure_time=optimized.get('takeoff', ''),
+            arrival_time=optimized.get('landing', ''),
+            duration=duration_str,
+            duration_minutes=duration_minutes,
+            cost=cost,
+            currency="USD",
+            base_fare=base_fare,
+            taxes=taxes,
+            total_fare=cost,
+            airline=airline,
+            flight_number=f"{airline_info.get('code', 'XX')}123",
+            stops=optimized.get('stops', 0),
+            is_connecting=optimized.get('is_connecting', False),
+            connection_airport=optimized.get('connection_airport', ''),
+            layover_hours=optimized.get('layover_hours', 0),
+            segments=[],
+            aircraft="Boeing 737",
+            cabin_class=CabinClass.ECONOMY,
+            available_seats=50,
+            seat_class="Economy",
+            baggage_allowance={"checked": 1, "carry_on": 1},
+            refund_policy="Non-refundable",
+            change_policy="Change fee applies",
+            meal_included=True,
+            entertainment=True,
+            wifi_available=False,
+            power_outlets=True,
+            booking_class="Y",
+            fare_basis="YOW",
+            ticket_type="Electronic",
+            search_timestamp=datetime.now(),
+            valid_until=datetime.now() + timedelta(hours=24)
+        )
+        
+        # Get user passenger information
+        user_passenger = await get_user_passenger_info(current_user["user_id"], current_user["token"])
         
         search_time_ms = (datetime.now() - start_time).total_seconds() * 1000
         
-        return OptimizedFlightResponse(
+        # Add user passenger information to the response
+        if optimized_flight:
+            optimized_flight.passenger_info = user_passenger
+        
+        return FlightSearchResponse(
             success=True,
             message=f"Optimized flight found from {request.source} to {request.destination}",
-            optimized_flight=optimized_flight,
+            flight=optimized_flight,
             total_flights=len(flights),
-            search_time_ms=search_time_ms
+            search_time_ms=search_time_ms,
+            priority_type=PriorityType.OPTIMIZED,
+            source=request.source,
+            destination=request.destination,
+            search_date=f"{request.year:04d}-{request.month:02d}-{request.day:02d}"
         )
         
     except Exception as e:
         search_time_ms = (datetime.now() - start_time).total_seconds() * 1000
-        return OptimizedFlightResponse(
+        return FlightSearchResponse(
             success=False,
             message=f"Error searching for optimized flight: {str(e)}",
-            search_time_ms=search_time_ms
+            flight=None,
+            total_flights=0,
+            search_time_ms=search_time_ms,
+            priority_type=PriorityType.OPTIMIZED,
+            source=request.source,
+            destination=request.destination,
+            search_date=f"{request.year:04d}-{request.month:02d}-{request.day:02d}"
         )
 
 @app.get("/api/optimized/search")
