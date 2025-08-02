@@ -2,7 +2,7 @@
 
 A comprehensive flight search and booking platform featuring a modern Next.js frontend, multiple specialized search APIs, authentication system, and unified booking capabilities.
 
-## 🚀 Features
+##  Features
 
 - **Multi-API Search System**: Three specialized APIs for cheapest, fastest, and optimized flight searches
 - **Unified Booking System**: Seamless integration between search APIs and booking backend
@@ -13,7 +13,7 @@ A comprehensive flight search and booking platform featuring a modern Next.js fr
 - **Real-time Results**: Instant search results from multiple search algorithms
 - **Booking Management**: Complete booking workflow with user trip management
 
-## 🏗️ System Architecture
+##  System Architecture
 
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
@@ -58,7 +58,7 @@ A comprehensive flight search and booking platform featuring a modern Next.js fr
                     └───────────────────────────┘
 ```
 
-## 📋 Prerequisites
+##  Prerequisites
 
 Before setting up the project, ensure you have the following installed:
 
@@ -83,7 +83,7 @@ npm --version     # Should be 9 or higher
 git --version     # Should be installed
 ```
 
-## 🛠️ Complete Setup Guide
+##  Complete Setup Guide
 
 ### Step 1: Clone the Repository
 ```bash
@@ -198,7 +198,7 @@ EOF
 cd ..
 ```
 
-## 🚀 Starting the Application
+##  Starting the Application
 
 ### Option 1: Automated Startup (Recommended)
 ```bash
@@ -274,7 +274,7 @@ npm run dev
 ```
 **Frontend will be running on:** http://localhost:3000
 
-## 🔍 Verifying the Setup
+##  Verifying the Setup
 
 ### 1. Check All Services Are Running
 ```bash
@@ -310,7 +310,7 @@ curl -X POST "http://localhost:8000/api/auth/login" \
   }'
 ```
 
-## 📡 API Documentation
+## API Documentation
 
 ### Backend API (Port 8000)
 - **Authentication**: `/api/auth/register`, `/api/auth/login`, `/api/auth/profile`
@@ -323,7 +323,7 @@ curl -X POST "http://localhost:8000/api/auth/login" \
 - **Optimized API**: http://localhost:8002/docs
 - **Unified Booking API**: http://localhost:8005/docs
 
-## 🎯 How to Use the Application
+##  How to Use the Application
 
 ### 1. User Registration & Login
 1. Open http://localhost:3000
@@ -352,7 +352,7 @@ curl -X POST "http://localhost:8000/api/auth/login" \
 2. Manage existing bookings
 3. View booking history
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 metta/
@@ -386,7 +386,7 @@ metta/
 └── README.md                  # This file
 ```
 
-## 🐛 Troubleshooting
+##  Troubleshooting
 
 ### Common Issues
 
@@ -447,7 +447,7 @@ curl http://localhost:8005/api/unified-booking/health
 - **Frontend not loading**: Ensure all APIs are running
 - **Database errors**: Verify database file permissions
 
-## 🔧 Development
+##  Development
 
 ### Adding New Features
 1. Create a feature branch: `git checkout -b feature/new-feature`
@@ -472,7 +472,7 @@ cd me-tt-a-flights
 npm test
 ```
 
-## 📊 Data Sources
+## Data Sources
 
 ### Flight Data
 - **Format**: MeTTa knowledge base format
@@ -485,7 +485,7 @@ npm test
 - **Location**: `details/airports.csv`
 - **Format**: CSV with airport codes, names, cities, states, countries
 
-## 🚀 Deployment
+##  Deployment
 
 ### Production Setup
 1. **Environment Variables**: Set production environment variables
@@ -500,7 +500,7 @@ npm test
 docker-compose up -d
 ```
 
-## 🤝 Contributing
+##  Contributing
 
 1. Fork the repository
 2. Create a feature branch
@@ -509,11 +509,11 @@ docker-compose up -d
 5. Ensure all tests pass
 6. Submit a pull request
 
-## 📄 License
+##  License
 
 This project is licensed under the MIT License.
 
-## 🙏 Acknowledgments
+##  Acknowledgments
 
 - **MeTTa**: For the powerful knowledge representation system
 - **Next.js**: For the excellent React framework
@@ -522,9 +522,11 @@ This project is licensed under the MIT License.
 - **JWT**: For secure authentication
 - **SQLAlchemy**: For database operations
 
-## 📞 Support
+##  Support
 
 For support and questions:
 - Create an issue in the repository
 - Check the troubleshooting section
-- Review the API documentation in `details/` folder 
+- Review the API documentation in `details/` folder
+- Contact No: +91 9816898181
+- Email : gautamsamanyu3482@gmail.com , samanyu3393.beai24@chitkara.edu.in
