@@ -1,207 +1,513 @@
-# MeTTa Flight Search System
+# MeTTa Flight Search & Booking System
 
-A modern flight booking application that combines a beautiful Next.js frontend with a powerful MeTTa knowledge base backend for intelligent flight search.
+A comprehensive flight search and booking platform featuring a modern Next.js frontend, multiple specialized search APIs, authentication system, and unified booking capabilities.
 
 ## 🚀 Features
 
-- **Real MeTTa Integration**: Search flights using the MeTTa knowledge base with 50,000+ flight records
+- **Multi-API Search System**: Three specialized APIs for cheapest, fastest, and optimized flight searches
+- **Unified Booking System**: Seamless integration between search APIs and booking backend
+- **User Authentication**: Complete login/signup system with JWT tokens
 - **Modern UI**: Beautiful, responsive frontend built with Next.js, Tailwind CSS, and shadcn/ui
-- **Smart Search**: Advanced filtering by source, destination, date, and price
-- **Real-time Results**: Instant search results from the MeTTa knowledge base
-- **RESTful API**: FastAPI backend with comprehensive flight search endpoints
+- **Real MeTTa Integration**: Search flights using the MeTTa knowledge base with 50,000+ flight records
+- **Smart Search**: Advanced filtering by source, destination, date, price, and travel preferences
+- **Real-time Results**: Instant search results from multiple search algorithms
+- **Booking Management**: Complete booking workflow with user trip management
 
-## 🏗️ Architecture
+## 🏗️ System Architecture
 
 ```
-Frontend (Next.js) ←→ FastAPI Backend ←→ MeTTa Knowledge Base
-     Port 3000           Port 8000         flights.metta (50K+ records)
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Cheapest API  │    │   Fastest API   │    │ Optimized API   │
+│   (Port 8001)   │    │   (Port 8003)   │    │   (Port 8002)   │
+│                 │    │                 │    │                 │
+│ • Price Focus   │    │ • Time Focus    │    │ • Balanced      │
+│ • Cost Sorting  │    │ • Duration Opt  │    │ • Multi-Factor  │
+│ • Budget Travel │    │ • Speed First   │    │ • Smart Scoring │
+└─────────┬───────┘    └─────────┬───────┘    └─────────┬───────┘
+          │                      │                      │
+          └──────────────────────┼──────────────────────┘
+                                 │
+                    ┌─────────────▼─────────────┐
+                    │   Unified Booking API     │
+                    │      (Port 8005)          │
+                    │                           │
+                    │ • Integration Layer       │
+                    │ • Data Transformation     │
+                    │ • Booking Orchestration   │
+                    │ • User Management         │
+                    └─────────────┬─────────────┘
+                                  │
+                    ┌─────────────▼─────────────┐
+                    │   Backend Auth & Booking  │
+                    │      (Port 8000)          │
+                    │                           │
+                    │ • User Authentication     │
+                    │ • Booking Management      │
+                    │ • Database Operations     │
+                    │ • Session Management      │
+                    └─────────────┬─────────────┘
+                                  │
+                    ┌─────────────▼─────────────┐
+                    │   Next.js Frontend        │
+                    │      (Port 3000)          │
+                    │                           │
+                    │ • User Interface          │
+                    │ • Search & Booking        │
+                    │ • Trip Management         │
+                    │ • Profile Management      │
+                    └───────────────────────────┘
 ```
 
 ## 📋 Prerequisites
 
-- Python 3.8+
-- Node.js 18+
-- npm or yarn
+Before setting up the project, ensure you have the following installed:
 
-## 🛠️ Installation
+### Required Software
+- **Python 3.12+** - [Download Python](https://www.python.org/downloads/)
+- **Node.js 18+** - [Download Node.js](https://nodejs.org/)
+- **Git** - [Download Git](https://git-scm.com/)
+- **pip** (Python package manager - usually comes with Python)
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd metta
-   ```
-
-2. **Install Python dependencies**
-   ```bash
-   cd project
-   pip install -r requirements.txt
-   cd ..
-   ```
-
-3. **Install Node.js dependencies**
-   ```bash
-   cd me-tt-a-flights
-   npm install
-   cd ..
-   ```
-
-## 🚀 Quick Start
-
-### Option 1: Use the startup script (Recommended)
+### Verify Installation
 ```bash
-./start.sh
+# Check Python version
+python --version  # Should be 3.12 or higher
+
+# Check Node.js version
+node --version    # Should be 18 or higher
+
+# Check npm version
+npm --version     # Should be 9 or higher
+
+# Check Git version
+git --version     # Should be installed
 ```
 
-This will start both the backend and frontend automatically.
+## 🛠️ Complete Setup Guide
 
-### Option 2: Manual startup
+### Step 1: Clone the Repository
+```bash
+# Clone the repository
+git clone <your-repository-url>
+cd metta
 
-1. **Start the MeTTa backend**
-   ```bash
-   cd project
-   python api.py
-   ```
-   The backend will be available at http://localhost:8000
-
-2. **Start the Next.js frontend** (in a new terminal)
-   ```bash
-   cd me-tt-a-flights
-   npm run dev
-   ```
-   The frontend will be available at http://localhost:3000
-
-## 📡 API Endpoints
-
-The FastAPI backend provides the following endpoints:
-
-- `GET /` - API status
-- `GET /health` - Health check
-- `POST /api/flights/search` - Search flights with parameters
-- `GET /api/flights/all` - Get all flights
-- `GET /api/flights/source/{source}` - Search by source airport
-- `GET /api/flights/destination/{destination}` - Search by destination airport
-- `GET /api/flights/route/{source}/{destination}` - Search by route
-
-### API Documentation
-Visit http://localhost:8000/docs for interactive API documentation.
-
-## 🔍 How to Use
-
-1. **Open the application** at http://localhost:3000
-2. **Search for flights** using the search form:
-   - Enter source and destination airports (e.g., JFK, LAX, SFO)
-   - Select departure date
-   - Choose number of passengers and travel class
-3. **View results** from the MeTTa knowledge base
-4. **Filter and sort** results using the sidebar filters
-5. **Select a flight** to proceed to booking
-
-## 📊 Sample Data
-
-The system includes a comprehensive flight dataset with:
-- **50,000+ flight records** in MeTTa format
-- **Data structure**: `(flight year month day source destination cost)`
-- **Sample airports**: JFK, LAX, SFO, ORD, ATL, MIA, and many more
-- **Date range**: 2013 flights with various routes and prices
-
-## 🧠 MeTTa Knowledge Base
-
-The flight data is stored in `project/Data/flights.metta` and contains:
-- Flight records in MeTTa syntax
-- Airport codes and routes
-- Pricing information
-- Date-based search capabilities
-
-### Sample MeTTa Query
-```metta
-!(match &space (flight 2013 1 1 JFK LAX $cost) (flight 2013 1 1 JFK LAX $cost))
+# Verify the project structure
+ls -la
 ```
 
-## 🎨 Frontend Features
-
-- **Responsive Design**: Works on desktop, tablet, and mobile
-- **Dark/Light Mode**: Toggle between themes
-- **Real-time Search**: Instant results from MeTTa backend
-- **Advanced Filtering**: Filter by price, source, destination
-- **Sorting Options**: Sort by price, date, source, destination
-- **Loading States**: Beautiful loading animations
-- **Error Handling**: User-friendly error messages
-
-## 🔧 Development
-
-### Backend Development
+### Step 2: Set Up Python Virtual Environment
 ```bash
-cd project
-# Install dependencies
+# Create a virtual environment
+python -m venv venv
+
+# Activate the virtual environment
+# On macOS/Linux:
+source venv/bin/activate
+# On Windows:
+# venv\Scripts\activate
+
+# Verify activation (you should see (venv) in your terminal)
+which python  # Should point to venv/bin/python
+```
+
+### Step 3: Install Python Dependencies
+
+#### Backend Dependencies
+```bash
+# Install backend dependencies
+cd backend
 pip install -r requirements.txt
-
-# Run the API
-python api.py
-
-# Run tests (if available)
-python -m pytest
+cd ..
 ```
 
-### Frontend Development
+#### Search APIs Dependencies
 ```bash
-cd me-tt-a-flights
-# Install dependencies
-npm install
+# Install cheapest API dependencies
+cd chatbot-api/cheapest-api
+pip install -r requirements.txt
+cd ../..
 
-# Run development server
-npm run dev
+# Install fastest API dependencies
+cd chatbot-api/fastest-api
+pip install -r requirements.txt
+cd ../..
 
-# Build for production
-npm run build
+# Install optimized API dependencies
+cd chatbot-api/optimized-api
+pip install -r requirements.txt
+cd ../..
 
-# Run tests
-npm test
+# Install unified booking API dependencies
+cd chatbot-api/unified-booking-api
+pip install -r requirements.txt
+cd ../..
 ```
+
+### Step 4: Set Up Database
+```bash
+# Navigate to backend directory
+cd backend
+
+# Initialize the database (this will create auth_database.db)
+python -c "
+from database.database import engine
+from models import user, booking
+user.Base.metadata.create_all(bind=engine)
+booking.Base.metadata.create_all(bind=engine)
+print('Database initialized successfully!')
+"
+
+cd ..
+```
+
+### Step 5: Install Node.js Dependencies
+```bash
+# Install frontend dependencies
+cd me-tt-a-flights
+npm install
+cd ..
+```
+
+### Step 6: Environment Configuration
+
+#### Backend Environment
+```bash
+# Create backend environment file
+cd backend
+cat > .env << EOF
+SECRET_KEY=your-super-secret-key-here
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+REFRESH_TOKEN_EXPIRE_DAYS=7
+DATABASE_URL=sqlite:///./auth_database.db
+EOF
+cd ..
+```
+
+#### Frontend Environment
+```bash
+# Create frontend environment file
+cd me-tt-a-flights
+cat > .env.local << EOF
+NEXT_PUBLIC_API_URL=http://localhost:8000
+NEXT_PUBLIC_CHEAPEST_API_URL=http://localhost:8001
+NEXT_PUBLIC_FASTEST_API_URL=http://localhost:8003
+NEXT_PUBLIC_OPTIMIZED_API_URL=http://localhost:8002
+NEXT_PUBLIC_UNIFIED_BOOKING_API_URL=http://localhost:8005
+EOF
+cd ..
+```
+
+## 🚀 Starting the Application
+
+### Option 1: Automated Startup (Recommended)
+```bash
+# Make the startup script executable
+chmod +x start_all_services.sh
+
+# Start all services
+./start_all_services.sh
+```
+
+### Option 2: Manual Startup
+
+#### Terminal 1: Backend Authentication & Booking API
+```bash
+# Activate virtual environment
+source venv/bin/activate
+
+# Start backend API
+cd backend
+python api.py
+```
+**Backend will be running on:** http://localhost:8000
+
+#### Terminal 2: Cheapest Search API
+```bash
+# Activate virtual environment
+source venv/bin/activate
+
+# Start cheapest API
+cd chatbot-api/cheapest-api
+python main.py
+```
+**Cheapest API will be running on:** http://localhost:8001
+
+#### Terminal 3: Fastest Search API
+```bash
+# Activate virtual environment
+source venv/bin/activate
+
+# Start fastest API
+cd chatbot-api/fastest-api
+python main.py
+```
+**Fastest API will be running on:** http://localhost:8003
+
+#### Terminal 4: Optimized Search API
+```bash
+# Activate virtual environment
+source venv/bin/activate
+
+# Start optimized API
+cd chatbot-api/optimized-api
+python main.py
+```
+**Optimized API will be running on:** http://localhost:8002
+
+#### Terminal 5: Unified Booking API
+```bash
+# Activate virtual environment
+source venv/bin/activate
+
+# Start unified booking API
+cd chatbot-api/unified-booking-api
+python main.py
+```
+**Unified Booking API will be running on:** http://localhost:8005
+
+#### Terminal 6: Frontend Application
+```bash
+# Start frontend
+cd me-tt-a-flights
+npm run dev
+```
+**Frontend will be running on:** http://localhost:3000
+
+## 🔍 Verifying the Setup
+
+### 1. Check All Services Are Running
+```bash
+# Check if all ports are active
+curl http://localhost:8000/health  # Backend
+curl http://localhost:8001/api/cheapest/health  # Cheapest API
+curl http://localhost:8003/api/fastest/health   # Fastest API
+curl http://localhost:8002/api/optimized/health # Optimized API
+curl http://localhost:8005/api/unified-booking/health # Unified Booking API
+```
+
+### 2. Test User Registration
+```bash
+# Register a test user
+curl -X POST "http://localhost:8000/api/auth/register" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "test@example.com",
+    "password": "testpassword123",
+    "first_name": "Test",
+    "last_name": "User"
+  }'
+```
+
+### 3. Test Authentication
+```bash
+# Login to get JWT token
+curl -X POST "http://localhost:8000/api/auth/login" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "test@example.com",
+    "password": "testpassword123"
+  }'
+```
+
+## 📡 API Documentation
+
+### Backend API (Port 8000)
+- **Authentication**: `/api/auth/register`, `/api/auth/login`, `/api/auth/profile`
+- **Bookings**: `/api/bookings`, `/api/bookings/{booking_id}`
+- **Documentation**: http://localhost:8000/docs
+
+### Search APIs
+- **Cheapest API**: http://localhost:8001/docs
+- **Fastest API**: http://localhost:8003/docs
+- **Optimized API**: http://localhost:8002/docs
+- **Unified Booking API**: http://localhost:8005/docs
+
+## 🎯 How to Use the Application
+
+### 1. User Registration & Login
+1. Open http://localhost:3000
+2. Click "Sign Up" to create a new account
+3. Fill in your details and create account
+4. Login with your credentials
+
+### 2. Flight Search
+1. Navigate to the "Flights" page
+2. Enter source and destination airports (e.g., JFK, LAX)
+3. Select departure date
+4. Choose search priority:
+   - **Cheapest**: Lowest price flights
+   - **Fastest**: Shortest duration flights
+   - **Optimized**: Balanced cost and time
+
+### 3. Flight Booking
+1. Select a flight from search results
+2. Click "Book Flight"
+3. Enter passenger details
+4. Provide payment information
+5. Confirm booking
+
+### 4. Trip Management
+1. View your bookings in "My Trips"
+2. Manage existing bookings
+3. View booking history
 
 ## 📁 Project Structure
 
 ```
 metta/
-├── project/                 # MeTTa Backend
-│   ├── api.py              # FastAPI application
-│   ├── main.py             # MeTTa integration
-│   ├── search_logic.metta  # MeTTa search functions
-│   ├── Data/
-│   │   └── flights.metta   # Flight knowledge base
-│   └── requirements.txt    # Python dependencies
-├── me-tt-a-flights/        # Next.js Frontend
-│   ├── app/                # App router pages
-│   ├── components/         # React components
-│   ├── hooks/              # Custom hooks
-│   ├── lib/                # Utilities and API service
-│   └── package.json        # Node.js dependencies
-├── start.sh               # Startup script
-└── README.md              # This file
+├── backend/                    # Authentication & Booking Backend
+│   ├── api.py                 # Main FastAPI application
+│   ├── auth_database.db       # SQLite database
+│   ├── models/                # Database models
+│   ├── schemas/               # Pydantic schemas
+│   ├── services/              # Business logic
+│   └── requirements.txt       # Python dependencies
+├── chatbot-api/               # Search & Booking APIs
+│   ├── cheapest-api/          # Cheapest flight search (Port 8001)
+│   ├── fastest-api/           # Fastest flight search (Port 8003)
+│   ├── optimized-api/         # Optimized flight search (Port 8002)
+│   └── unified-booking-api/   # Unified booking system (Port 8005)
+├── me-tt-a-flights/           # Next.js Frontend
+│   ├── app/                   # App router pages
+│   ├── components/            # React components
+│   ├── hooks/                 # Custom hooks
+│   ├── lib/                   # Utilities and API service
+│   └── package.json           # Node.js dependencies
+├── details/                   # Documentation & Data
+│   ├── airports.csv           # Airport codes and names
+│   ├── metta_sample_flights.csv # Sample flight data
+│   ├── chatbot_apis_documentation.md # API documentation
+│   └── api_descriptions.md    # API descriptions
+├── project/                   # Original MeTTa data
+│   └── Data/                  # Flight data files
+├── venv/                      # Python virtual environment
+├── start_all_services.sh      # Startup script
+└── README.md                  # This file
 ```
 
 ## 🐛 Troubleshooting
 
-### Backend Issues
-- **Port 8000 already in use**: Kill the process or change the port in `api.py`
-- **MeTTa loading errors**: Check that `flights.metta` exists in `project/Data/`
-- **Import errors**: Ensure all Python dependencies are installed
+### Common Issues
 
-### Frontend Issues
-- **Port 3000 already in use**: Kill the process or change the port
-- **API connection errors**: Ensure the backend is running on port 8000
-- **Build errors**: Clear `.next` folder and reinstall dependencies
+#### 1. Port Already in Use
+```bash
+# Find process using the port
+lsof -i :8000  # Replace with your port number
 
-### General Issues
-- **CORS errors**: Check that the backend CORS settings include `http://localhost:3000`
-- **Data not loading**: Verify the MeTTa knowledge base is properly loaded
+# Kill the process
+kill -9 <PID>
+```
+
+#### 2. Virtual Environment Issues
+```bash
+# Deactivate current environment
+deactivate
+
+# Remove and recreate virtual environment
+rm -rf venv
+python -m venv venv
+source venv/bin/activate
+```
+
+#### 3. Database Issues
+```bash
+# Remove and recreate database
+cd backend
+rm auth_database.db
+python -c "
+from database.database import engine
+from models import user, booking
+user.Base.metadata.create_all(bind=engine)
+booking.Base.metadata.create_all(bind=engine)
+"
+```
+
+#### 4. Node.js Dependencies Issues
+```bash
+# Clear npm cache and reinstall
+cd me-tt-a-flights
+rm -rf node_modules package-lock.json
+npm cache clean --force
+npm install
+```
+
+#### 5. API Connection Issues
+```bash
+# Check if all APIs are running
+curl http://localhost:8000/health
+curl http://localhost:8001/api/cheapest/health
+curl http://localhost:8003/api/fastest/health
+curl http://localhost:8002/api/optimized/health
+curl http://localhost:8005/api/unified-booking/health
+```
+
+### Performance Issues
+- **Slow API responses**: Check if virtual environment is activated
+- **Frontend not loading**: Ensure all APIs are running
+- **Database errors**: Verify database file permissions
+
+## 🔧 Development
+
+### Adding New Features
+1. Create a feature branch: `git checkout -b feature/new-feature`
+2. Make your changes
+3. Test thoroughly
+4. Commit with descriptive messages
+5. Push and create a pull request
+
+### Code Style
+- **Python**: Follow PEP 8 guidelines
+- **JavaScript/TypeScript**: Use ESLint and Prettier
+- **API Design**: Follow RESTful principles
+
+### Testing
+```bash
+# Backend tests
+cd backend
+python -m pytest
+
+# Frontend tests
+cd me-tt-a-flights
+npm test
+```
+
+## 📊 Data Sources
+
+### Flight Data
+- **Format**: MeTTa knowledge base format
+- **Location**: `project/Data/flights.metta`
+- **Records**: 50,000+ flight records
+- **Structure**: `(flight year month day source dest cost takeoff landing)`
+
+### Airport Data
+- **Source**: Extracted from flight dataset
+- **Location**: `details/airports.csv`
+- **Format**: CSV with airport codes, names, cities, states, countries
+
+## 🚀 Deployment
+
+### Production Setup
+1. **Environment Variables**: Set production environment variables
+2. **Database**: Use PostgreSQL instead of SQLite
+3. **Caching**: Implement Redis for performance
+4. **Load Balancing**: Use nginx or similar
+5. **Monitoring**: Set up logging and monitoring
+
+### Docker Deployment
+```bash
+# Build and run with Docker Compose
+docker-compose up -d
+```
 
 ## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+4. Add tests for new features
+5. Ensure all tests pass
+6. Submit a pull request
 
 ## 📄 License
 
@@ -212,4 +518,13 @@ This project is licensed under the MIT License.
 - **MeTTa**: For the powerful knowledge representation system
 - **Next.js**: For the excellent React framework
 - **FastAPI**: For the high-performance Python web framework
-- **shadcn/ui**: For the beautiful UI components 
+- **shadcn/ui**: For the beautiful UI components
+- **JWT**: For secure authentication
+- **SQLAlchemy**: For database operations
+
+## 📞 Support
+
+For support and questions:
+- Create an issue in the repository
+- Check the troubleshooting section
+- Review the API documentation in `details/` folder 
