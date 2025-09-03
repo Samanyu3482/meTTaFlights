@@ -1,0 +1,10 @@
+INFO:     Started server process [83545]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 48] error while attempting to bind on address ('0.0.0.0INFO:     127.0.0.1:54137 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54220 - "OPTIONS /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54220 - "GET /api/auth/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54264 - "OPTIONS /api/auth/login HTTP/1.1" 200 OK
+/Users/vishalgautam/Desktop/metta/backend/api.py:131: PydanticDeprecatedSince20: The `from_orm` method is deprecated; set `model_config['from_attributes']=True` and use `model_validate` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.5/migration/
+  user=UserResponse.from_orm(user)
+INFO:     127.0.0.1:54264 - "POST /api/auth/login HTTP/1.1" 200 OK
