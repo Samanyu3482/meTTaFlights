@@ -75,62 +75,79 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const login = async (email: string, password: string) => {
-    setLoading(true)
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      })
+  setLoading(true)
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    })
 
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.detail || 'Login failed')
-      }
+    // Parse JSON only once
+    const data = await response.json()
 
-      const data = await response.json()
-      setUser(data.user)
-      localStorage.setItem("access_token", data.access_token)
-      localStorage.setItem("refresh_token", data.refresh_token)
-      localStorage.setItem("user", JSON.stringify(data.user))
-    } catch (error) {
-      console.error('Login error:', error)
-      throw error
-    } finally {
-      setLoading(false)
+    if (!response.ok) {
+      throw new Error(
+        typeof data.detail === 'string'
+          ? data.detail
+          : JSON.stringify(data.detail) || 'Login failed'
+      )
     }
+
+    // Success case
+    setUser(data.user)
+    localStorage.setItem("access_token", data.access_token)
+    localStorage.setItem("refresh_token", data.refresh_token)
+    localStorage.setItem("user", JSON.stringify(data.user))
+
+  } catch (error) {
+    console.error('Login error:', error)
+    throw error
+  } finally {
+    setLoading(false)
   }
+}
+
 
   const register = async (email: string, password: string, name: string) => {
-    setLoading(true)
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password, name }),
-      })
+  setLoading(true)
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password, name }),
+    })
 
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.detail || 'Registration failed')
-      }
+    // Parse response JSON once
+    const data = await response.json()
 
-      const data = await response.json()
-      setUser(data.user)
-      localStorage.setItem("access_token", data.access_token)
-      localStorage.setItem("refresh_token", data.refresh_token)
-      localStorage.setItem("user", JSON.stringify(data.user))
-    } catch (error) {
-      console.error('Registration error:', error)
-      throw error
-    } finally {
-      setLoading(false)
+    if (!response.ok) {
+      // Handle error response properly
+      throw new Error(
+        typeof data.detail === 'string'
+          ? data.detail
+          : JSON.stringify(data.detail) || 'Registration failed'
+      )
     }
+
+    // Success case
+    setUser(data.user)
+    localStorage.setItem("access_token", data.access_token)
+    localStorage.setItem("refresh_token", data.refresh_token)
+    localStorage.setItem("user", JSON.stringify(data.user))
+    
+  } catch (error) {
+    console.error('Registration error:', error)
+    throw error
+  } finally {
+    setLoading(false)
   }
+}
+
 
   const updateProfile = async (profileData: Partial<User>) => {
     const token = localStorage.getItem("access_token")
