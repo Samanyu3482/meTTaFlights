@@ -1,0 +1,154 @@
+version: "3.1"
+
+nlu:
+- intent: find_flight
+  examples: |
+    - Book me a flight from [New York](source) to [Boston](destination) on [15](day)/[09](month)/[2025](year)
+    - Find me the cheapest flight to [Miami](destination) from [Chicago](source) on [2025](year)-[09](month)-[18](day)
+    - I need an optimized flight from [Seattle](source) to [Denver](destination) on [20](day) [September](month) [2025](year)
+    - Get me the fastest flight [Atlanta](source) to [Dallas](destination) tomorrow
+    - book me a flight from [JFK](source) to [MIA](destination) on [2025-09-16](date)
+    - find a flight from [PHX](source) to [BUR](destination) on [2025-09-20](date)
+    - find a flight from [atl](source) to [lax](destination) on [2025-09-12](date)
+    - book me a flight from [jfk](source) to [mia](destination) on [2025-09-16](date)
+    - I need a flight from [new york](source) to [boston](destination) on [16/09/2025](date)
+    - show flights from [phoenix](source) to [dallas](destination) tomorrow
+    - get me a flight from [sfo](source) to [ord](destination) next week
+    - any flights from [delhi](source) to [mumbai](destination) on [2025-10-05](date)?
+    - cheapest flight from [chicago](source) to [los angeles](destination) on [2025-09-18](date)
+    - fastest flight from [bangalore](source) to [hyderabad](destination) on [2025-09-20](date)
+    - find flights [lhr](source) → [cdg](destination) on [2025-09-22](date)
+    - show me options from [paris](source) to [rome](destination) [2025-09-30](date)
+    - flight from [boston](source) to [new york](destination) this friday
+    - I want to travel from [houston](source) to [miami](destination) on [2025-09-25](date)
+    - get a flight ticket from [sydney](source) to [melbourne](destination) on [25/09/2025](date)
+    - are there flights from [del](source) to [blr](destination) tomorrow?
+    - list flights [ams](source) to [fra](destination) on [2025-09-19](date)
+    - can you book me a flight [2025-09-17](date) from [denver](source) to [seattle](destination)?
+    - help me find flights between [toronto](source) and [vancouver](destination) on [2025-09-15](date)
+    - I’m looking for an optimized flight from [atl](source) to [sfo](destination) on [2025-09-21](date)
+    - show me flights from [mexico city](source) to [cancun](destination) [2025-09-28](date)
+    - book my trip [jfk](source) → [bos](destination) for [2025-09-12](date)
+    - get tickets from [las vegas](source) to [san francisco](destination) [2025-09-19](date)
+    - find me a direct flight from [phx](source) to [bur](destination) [2025-09-15](date)
+    - list available flights from [atlanta](source) to [dallas](destination) [2025-09-17](date)
+    - can you check flights from [ord](source) to [mia](destination) for [2025-09-20](date)?
+    - I need to book from [kolkata](source) to [delhi](destination) on [2025-09-14](date)
+    - any flights [dubai](source) to [london](destination) [2025-10-01](date)?
+    - flights [hyd](source) to [maa](destination) on [15/09/2025](date)
+    - give me the flight details from [bengaluru](source) to [goa](destination) on [16/09/2025](date)
+    - check available flights from [nyc](source) to [bos](destination) on [2025-09-12](date)
+    - flights tomorrow from [sfo](source) to [lax](destination)
+    - show the optimized flights from [del](source) to [bom](destination) on [2025-09-13](date)
+    - I need a business class flight [2025-09-20](date) from [frankfurt](source) to [dubai](destination)
+    - get me connecting flights from [blr](source) to [sfo](destination) on [2025-09-25](date)
+    - find a flight from [LAX](source) to [MIA](destination) on [2025-09-19](date)
+    - show me flights from [lax](source) to [mia](destination) on [2025-09-19](date)
+    - book me a flight from [LAX](source) to [MIA](destination) on [2025-09-19](date)
+    - I need a flight to [Miami](destination) from [Los Angeles](source)
+    - flights from [JFK](source) to [SFO](destination)
+    - what flights are there from [nyc](source) to [mia](destination) tomorrow?
+    - find flights from [atl](source) to [den](destination)
+    - show me flights from [ord](source) to [lga](destination) next month
+    - get me a ticket from [LA](source) to [NY](destination)
+    - I want to travel from [lga](source) to [bgr](destination) on [2025-09-19](date)
+    - find me a flight from [lga](source) to [bgr](destination) on [2025-09-19](date)
+    - cheapest flight from [lga](source) to [bgr](destination) on [2025-09-18](date)
+    - book a flight from [LaGuardia](source) to [Bangor](destination) on [2025-09-19](date)
+    - flights to [BGR](destination) from [LGA](source) on [2025-09-19](date)
+- intent: greet
+  examples: |
+    - hey
+    - hello
+    - hi
+    - hello there
+    - good morning
+    - good evening
+    - moin
+    - hey there
+    - let's go
+    - hey dude
+    - goodmorning
+    - goodevening
+    - good afternoon
+
+- intent: goodbye
+  examples: |
+    - cu
+    - good by
+    - cee you later
+    - good night
+    - bye
+    - goodbye
+    - have a nice day
+    - see you around
+    - bye bye
+    - see you later
+
+- intent: affirm
+  examples: |
+    - yes
+    - y
+    - indeed
+    - of course
+    - that sounds good
+    - correct
+
+- intent: deny
+  examples: |
+    - no
+    - n
+    - never
+    - I don't think so
+    - don't like that
+    - no way
+    - not really
+
+- intent: mood_great
+  examples: |
+    - perfect
+    - great
+    - amazing
+    - feeling like a king
+    - wonderful
+    - I am feeling very good
+    - I am great
+    - I am amazing
+    - I am going to save the world
+    - super stoked
+    - extremely good
+    - so so perfect
+    - so good
+    - so perfect
+
+- intent: mood_unhappy
+  examples: |
+    - my day was horrible
+    - I am sad
+    - I don't feel very well
+    - I am disappointed
+    - super sad
+    - I'm so sad
+    - sad
+    - very sad
+    - unhappy
+    - not good
+    - not very good
+    - extremly sad
+    - so saad
+    - so sad
+
+- intent: bot_challenge
+  examples: |
+    - are you a bot?
+    - are you a human?
+    - am I talking to a bot?
+    - am I talking to a human?
+
+- intent: provide_credentials
+  examples: |
+    - my username is [testuser](username)
+    - [testuser](username)
+    - [user1](username) and my mpin is [1234](mpin)
+    - my mpin is [1234](mpin)
+    - [1234](mpin)

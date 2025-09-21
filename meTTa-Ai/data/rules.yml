@@ -1,0 +1,36 @@
+version: "3.1"
+
+rules:
+  - rule: Handle all general chat with Gemini fallback
+    steps:
+      - intent: nlu_fallback
+      - action: action_gemini_fallback
+
+  - rule: Say 'I am a bot' anytime the user challenges
+    steps:
+      - intent: bot_challenge
+      - action: utter_iamabot
+
+  - rule: Flight search rule
+    steps:
+      - intent: find_flight
+      - action: action_find_flight
+
+  - rule: Activate booking form for all booking intents
+    steps:
+      - or:
+        - intent: request_booking
+        - intent: request_booking_from_button
+      - action: booking_form
+      - active_loop: booking_form
+
+  - rule: Confirm booking after form completion
+    condition:
+      - active_loop: booking_form
+    steps:
+      - action: booking_form
+      - slot_was_set:
+          - requested_slot: null
+      - active_loop: null
+      - action: action_book_flight
+      - action: action_listen

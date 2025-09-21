@@ -1,0 +1,154 @@
+version: "3.1"
+
+intents:
+  - find_flight
+  - request_booking
+  - provide_credentials
+  - confirm_booking
+  - deny_booking
+  - nlu_fallback
+  - request_flight_info
+  - request_booking_from_button
+
+entities:
+  - source
+  - destination
+  - year
+  - month
+  - day
+  - priority
+  - date
+  - username
+  - mpin
+  - booking_confirmed
+
+slots:
+  flight_info:
+    type: any
+    influence_conversation: false
+    mappings:
+      - type: custom
+  source:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: source
+  destination:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: destination
+  year:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: year
+  month:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: month
+  day:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: day
+  priority:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: priority
+  date:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: date
+  username:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: username
+        intent: provide_credentials
+  mpin:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: mpin
+        intent: provide_credentials
+  booking_confirmed:
+    type: bool
+    influence_conversation: false
+    mappings:
+      - type: custom
+  user_authenticated:
+    type: bool
+    influence_conversation: false
+    mappings:
+      - type: custom
+
+forms:
+  booking_form:
+    required_slots:
+      - username
+      - mpin
+
+responses:
+  utter_greet:
+    - text: "Hey! I am meTTa-AI your personal travel assistant. Can I book a flight for you?"
+  utter_cheer_up:
+  - text: "Here is something to cheer you up: Why don't scientists trust atoms? Because they make up everything!"
+  - text: "Here is something to cheer you up: What did the ocean say to the beach? Nothing, it just waved!"
+  - text: "Here is something to cheer you up: Why don't programmers like nature? It has too many bugs."
+  - text: "Here is something to cheer you up: Why did the scarecrow win an award? Because he was outstanding in his field!"
+  - text: "Here is something to cheer you up: Parallel lines have so much in common… it's a shame they'll never meet."
+
+  utter_did_that_help:
+    - text: "Did that help you?"
+
+
+
+  utter_iamabot:
+    - text: "I am a bot, powered by Rasa."
+  utter_ask_username:
+    - text: "What is your username?"
+  utter_ask_mpin:
+    - text: "Please enter your F-PIN."
+  utter_ask_booking_confirmation:
+    - text: "Would you like to confirm the booking for this flight?"
+  utter_authentication_failed:
+    - text: "Authentication failed. Please check your username and MPIN."
+  utter_booking_confirmed:
+    - text: "Booking confirmed! A confirmation email has been sent."
+  utter_booking_cancelled:
+    - text: "Booking cancelled."
+  
+  utter_ask_flight_info:
+    - text: "Yes, I can. Please provide the departure city, arrival city, and date of travel."
+  
+  utter_project_info:
+  - text: |
+      This flight booking system, called "MeTTa-Flights," is an AI-powered platform developed as an academic project at Chitkara University for HACKINDIA - 2025. It integrates modern technologies like Next.js frontend, FastAPI backend, and a unique MeTTa knowledge representation system for storing 75,654 flight records. The AI chatbot understands natural language queries, guides users through flight search and booking, and maintains conversation context.
+
+      The project uses MeTTa – a knowledge representation framework developed by Singularity Net – to encode complex flight relationships and perform intelligent search and route optimization. It supports features like direct flights, connecting flights, multi-city journeys, real-time pricing, and secure booking management.
+
+      This work demonstrates state-of-the-art AI integration, real-time processing, and user-friendly interfaces, guided by faculty and technical advisors at Chitkara University.
+
+      This project is a testament to the power of AI and modern web technologies in transforming traditional services like flight booking into seamless, intelligent experiences.
+
+      Chatbot uses RASA framework for NLU and dialogue management and MeTTa for knowledge representation and reasoning to check flight availability.
+      
+      Developed by: Team Error 404
+      - Samanyu Gautam
+      - Himanshi
+      - Kriti
+
+actions:
+  - action_find_flight
+  - action_authenticate_user
+  - action_book_flight
+  - action_set_flight_details 
+  - action_gemini_fallback
+
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true

@@ -1,0 +1,1712 @@
+version: "3.1"
+
+nlu:
+
+- intent: request_booking
+  examples: |
+    - /request_booking
+
+- intent: find_flight
+  examples: |
+    - Book me a flight from [New York](source) to [Boston](destination) on [15](day)/[09](month)/[2025](year)
+    - Find me the cheapest flight to [Miami](destination) from [Chicago](source) on [2025](year)-[09](month)-[18](day)
+    - I need an optimized flight from [Seattle](source) to [Denver](destination) on [20](day) [September](month) [2025](year)
+    - Get me the fastest flight [Atlanta](source) to [Dallas](destination) tomorrow
+    - book me a flight from [JFK](source) to [MIA](destination) on [2025-09-16](date)
+    - find a flight from [PHX](source) to [BUR](destination) on [2025-09-20](date)
+    - find a flight from [atl](source) to [lax](destination) on [2025-09-12](date)
+    - book me a flight from [jfk](source) to [mia](destination) on [2025-09-16](date)
+    - I need a flight from [new york](source) to [boston](destination) on [16/09/2025](date)
+    - show flights from [phoenix](source) to [dallas](destination) tomorrow
+    - get me a flight from [sfo](source) to [ord](destination) next week
+    - any flights from [delhi](source) to [mumbai](destination) on [2025-10-05](date)?
+    - cheapest flight from [chicago](source) to [los angeles](destination) on [2025-09-18](date)
+    - fastest flight from [bangalore](source) to [hyderabad](destination) on [2025-09-20](date)
+    - find flights [lhr](source) → [cdg](destination) on [2025-09-22](date)
+    - show me options from [paris](source) to [rome](destination) [2025-09-30](date)
+    - flight from [boston](source) to [new york](destination) this friday
+    - I want to travel from [houston](source) to [miami](destination) on [25/09/2025](date)
+    - get a flight ticket from [sydney](source) to [melbourne](destination) on [25/09/2025](date)
+    - are there flights from [del](source) to [blr](destination) tomorrow?
+    - list flights [ams](source) to [fra](destination) on [2025-09-19](date)
+    - can you book me a flight [2025-09-17](date) from [denver](source) to [seattle](destination)?
+    - help me find flights between [toronto](source) and [vancouver](destination) on [2025-09-15](date)
+    - I’m looking for an optimized flight from [atl](source) to [sfo](destination) on [2025-09-21](date)
+    - show me flights from [mexico city](source) to [cancun](destination) [2025-09-28](date)
+    - book my trip [jfk](source) → [bos](destination) for [2025-09-12](date)
+    - get tickets from [las vegas](source) to [san francisco](destination) [2025-09-19](date)
+    - find me a direct flight from [phx](source) to [bur](destination) [2025-09-15](date)
+    - list available flights from [atlanta](source) to [dallas](destination) [2025-09-17](date)
+    - can you check flights from [ord](source) to [mia](destination) for [2025-09-20](date)?
+    - I need to book from [kolkata](source) to [delhi](destination) on [2025-09-14](date)
+    - any flights [dubai](source) to [london](destination) [2025-10-01](date)?
+    - flights [hyd](source) to [maa](destination) on [15/09/2025](date)
+    - give me the flight details from [bengaluru](source) to [goa](destination) on [16/09/2025](date)
+    - check available flights from [nyc](source) to [bos](destination) on [2025-09-12](date)
+    - flights tomorrow from [sfo](source) to [lax](destination)
+    - show the optimized flights from [del](source) to [bom](destination) on [2025-09-13](date)
+    - I need a business class flight [2025-09-20](date) from [frankfurt](source) to [dubai](destination)
+    - get me connecting flights from [blr](source) to [sfo](destination) on [2025-09-25](date)
+    - find a flight from [LAX](source) to [MIA](destination) on [2025-09-19](date)
+    - show me flights from [lax](source) to [mia](destination) on [2025-09-19](date)
+    - book me a flight from [LAX](source) to [MIA](destination) on [2025-09-19](date)
+    - I need a flight to [Miami](destination) from [Los Angeles](source)
+    - flights from [JFK](source) to [SFO](destination)
+    - what flights are there from [nyc](source) to [mia](destination) tomorrow?
+    - find flights from [atl](source) to [den](destination)
+    - show me flights from [ord](source) to [lga](destination) next month
+    - get me a ticket from [LA](source) to [NY](destination)
+    - I want to travel from [lga](source) to [bgr](destination) on [2025-09-19](date)
+    - find me a flight from [lga](source) to [bgr](destination) on [2025-09-19](date)
+    - cheapest flight from [lga](source) to [bgr](destination) on [2025-09-18](date)
+    - book a flight from [LaGuardia](source) to [Bangor](destination) on [2025-09-19](date)
+    - flights to [BGR](destination) from [LGA](source) on [2025-09-19](date)
+    - [BGR](source) to [LGA](destination) on [2025-09-19](date)
+    - from [ATL](source) to [DEN](destination) on [2025-09-20](date)
+    - I want to travel from [lga](source) to [bgr](destination) on [2025-09-19](date)
+    - find a flight from [JFK](source) to [LAX](destination) on [2025-09-27](date)
+    - flights from [Boston](source) to [Seattle](destination) on [2025-09-27](date)
+    - show me flights from [SFO](source) to [JFK](destination) on [2025-10-15](date)
+    - book me a flight from [Newark](source) to [Boston](destination)
+    - I need a flight from [EWR](source) to [SEA](destination) for [2025-09-27](date)
+    - get me a flight from [Atlanta](source) to [Denver](destination) tomorrow
+    - cheapest flight from [Chicago](source) to [Los Angeles](destination) on [2025-09-18](date)
+    - fastest flight from [JFK](source) to [MIA](destination)
+    - are there flights from [Dallas](source) to [San Francisco](destination) this Friday?
+    - can you find flights from [Houston](source) to [Orlando](destination)
+    - I want to travel from [Philadelphia](source) to [Phoenix](destination) on [2025-11-20](date)
+    - flights from [LGA](source) to [ORD](destination) on [2025-10-15](date)
+    - show me flight options from [LAX](source) to [MIA](destination)
+    - get me tickets from [Las Vegas](source) to [San Diego](destination) next week
+    - I need a flight from [Washington National](source) to [Denver](destination)
+    - what flights are there from [PHX](source) to [BUR](destination)
+    - flights to [BGR](destination) from [LGA](source)
+    - I need a flight from [Houston](source) to [Jacksonville](destination) on [2025-09-28](date)
+    - find a flight from [Oakland](source) to [Detroit](destination)
+    - book a ticket from [BWI](source) to [MCO](destination) on [2025-10-05](date)
+    - show me flights from [Honolulu](source) to [San Jose](destination)
+    - get me flights from [Milwaukee](source) to [Austin](destination) on [2025-11-10](date)
+    - I want to fly from [San Antonio](source) to [Boston](destination)
+    - flights from [Portland OR](source) to [Salt Lake City](destination)
+    - get tickets from [St. Louis](source) to [New Orleans](destination)
+    - I want a flight from [Nashville](source) to [Washington Dulles](destination) on [2025-12-01](date)
+    - find a flight from [Syracuse](source) to [Tampa](destination)
+    - show me the cheapest flight from [Knoxville](source) to [Phoenix](destination)
+    - show me the fastest flight from [EWR](source) to [MIA](destination)
+    - flights from [Dallas](source) to [San Francisco](destination) this weekend
+    - search flights from [Indianapolis](source) to [San Diego](destination)
+    - get me flights from [Honolulu](source) to [Austin](destination) on [2025-12-05](date)
+    - I'm looking for a flight from [Kansas City](source) to [Minneapolis](destination) on [2025-12-20](date)
+    - find me a ticket from [Houston](source) to [SFO](destination) tomorrow
+    - get me an optimized flight from [Charlotte](source) to [Las Vegas](destination) on [2026-01-10](date)
+    - I need to fly from [San Jose](source) to [Newark](destination)
+    - book a flight from [Salt Lake City](source) to [Sacramento](destination)
+    - flights from [Atlanta](source) to [Boston](destination)
+    - show me tickets from [Portland OR](source) to [Phoenix](destination) on [2026-02-14](date)
+    - what flights are available from [Baltimore](source) to [Denver](destination)?
+    - I want a flight from [BWI](source) to [DEN](destination) next Tuesday
+    - get me a flight from [Fort Lauderdale](source) to [Miami](destination)
+    - flights from [MKE](source) to [BWI](destination) on [2026-03-01](date)
+    - book a flight from [New Orleans](source) to [New York](destination)
+    - find a flight from [Oklahoma City](source) to [Omaha](destination)
+    - I want to travel from [Philadelphia](source) to [Pittsburgh](destination)
+    - cheapest flights from [San Juan](source) to [San Francisco](destination)
+    - flights from [Tampa](source) to [Atlanta](destination) for [2026-04-10](date)
+    - show me a flight from [Hartford](source) to [Washington Dulles](destination) on [2026-05-20](date)
+    - can you find flights from [Burlington](source) to [Houston Intercontinental](destination)?
+    - get me the best flight from [Jacksonville](source) to [Louisville](destination)
+    - I want a flight from [San Diego](source) to [San Antonio](destination) on [2026-06-15](date)
+    - find a flight from [DFW](source) to [JFK](destination) on [2025-10-10](date)
+    - flights from [ATL](source) to [ORD](destination) for [2025-11-20](date)
+    - show me flights from [MIA](source) to [LAX](destination) next week
+    - book me a flight from [BWI](source) to [BOS](destination)
+    - I need a flight from [SFO](source) to [EWR](destination) tomorrow
+    - get me a flight from [SEA](source) to [DEN](destination) on [2025-12-05](date)
+    - cheapest flight from [MCO](source) to [DTW](destination)
+    - fastest flight from [LAS](source) to [PHL](destination)
+    - are there flights from [IAD](source) to [HOU](destination) this weekend?
+    - can you find flights from [PHX](source) to [BUR](destination)
+    - I want to travel from [MKE](source) to [MHT](destination) on [2026-01-15](date)
+    - flights from [MSN](source) to [MSP](destination) on [2026-02-01](date)
+    - show me flight options from [MSY](source) to [MTJ](destination)
+    - get me tickets from [OAK](source) to [OKC](destination) next month
+    - I need a flight from [OMA](source) to [ORF](destination) on [2026-03-20](date)
+    - what flights are there from [PIT](source) to [PWM](destination)
+    - flights to [RDU](destination) from [RIC](source)
+    - I need a flight from [ROC](source) to [RSW](destination) on [2026-04-10](date)
+    - find a flight from [SAN](source) to [SAT](destination)
+    - book a ticket from [SDF](source) to [STL](destination)
+    - show me tickets from [SYR](source) to [TPA](destination) on [2026-05-01](date)
+    - get me flights from [LGA](source) to [DFW](destination)
+    - I want to fly from [LAX](source) to [MSY](destination) on [2026-06-12](date)
+    - find a flight from [LGB](source) to [MCI](destination)
+    - get me a flight from [PDX](source) to [PHX](destination) on [2026-07-25](date)
+    - flights from [SBN](source) to [TUL](destination) this week
+    - show me the cheapest flight from [SJC](source) to [SJU](destination)
+    - find flights from [SLC](source) to [SMF](destination) on [2026-08-08](date)
+    - I want to book a flight from [SNA](source) to [SRQ](destination)
+
+
+
+- intent: provide_credentials
+  examples: |
+    - my username is [testuser](username)
+    - [testuser](username)
+    - [user1](username) and my mpin is [1234](mpin)
+    - my mpin is [1234](mpin)
+    - [1234](mpin)
+
+- intent: confirm_booking
+  examples: |
+    - yes, confirm booking
+    - please book it
+    - confirm the flight
+    - yes, book this flight
+
+- intent: deny_booking
+  examples: |
+    - no, don't book it
+    - cancel the booking
+    - don't confirm
+    - no, thank you
+
+
+- intent: nlu_fallback
+  examples: |
+    # Common Greetings and Social Phrases
+    - hi
+    - hello
+    - hey there
+    - good morning
+    - good afternoon
+    - good evening
+    - what's up
+    - how are you
+    - how's it going
+    - what's going on
+    - nice to meet you
+    - pleasure to meet you
+    - hi, bot
+    - hey, chatbot
+    - greetings
+    - sup
+    - howdy
+    - yo
+    - what can you do for me
+    - what are you doing
+    - what's your purpose
+    - tell me about yourself
+    - who are you
+    - are you a human
+    - are you a bot
+    - are you a robot
+    - what's your name
+    - do you have a name
+    - where are you from
+    - how old are you
+    - how were you made
+    - tell me a joke
+    - do you like humans
+    - what is the weather today?
+    - what is the weather like
+    - is it going to rain
+    - what is the temperature outside
+    - what is the date
+    - what time is it
+    - what day is it
+    - what is an llm
+    - what is rasa
+    - what is metta
+    - what is singularitynet
+    - tell me about the tech stack
+    - what technologies do you use
+    - where is chitkara university
+    - chitkara university
+    - tell me about hackindia 2025
+    - what is hackindia
+    - how's the weather
+    - what about the weather
+
+    # Off-Topic and General Questions
+    - tell me something
+    - what is your favorite color
+    - what kind of food do you like
+    - what's your favorite song
+    - what movies have you seen
+    - have you read any books
+    - can you sing a song
+    - what's your opinion on AI
+    - can you help me with my homework
+    - what is the meaning of life
+    - what are you
+    - I'm feeling bored
+    - can you entertain me
+    - let's play a game
+    - what's a good place to visit
+    - where should I go on vacation
+    - what's a popular travel destination
+    - what's the best time to visit Italy
+    - how do I get a passport
+    - what are the visa requirements for France
+    - tell me about a historical event
+    - what's the capital of Germany
+    - what is an LLM
+    - who is the prime minister
+    - what are the biggest cities in the world
+    - tell me about the solar system
+    - how do airplanes fly
+    - what is the best airline
+    - can you play basketball
+    - what's the score of the match today
+    - who won the India-Pakistan match
+    - are you sentient
+
+    # Nonsensical and Vague Input
+    - hdhshdhdh
+    - jksdhdjkshd
+    - qwertyuiop
+    - asdfghjkl
+    - zxcvbnm
+    - oya
+    - pqlaowsie
+    - mttaflihts
+    - asd
+    - i am confused
+    - i don't understand
+    - what?
+    - huh?
+    - what's that
+    - tell me more
+    - what is that
+    - tell me about that
+    - i don't know
+    - what do you mean
+    - what are you saying
+    - what
+    - i don't get it
+    - help me
+    - what do i do
+
+    # Negative and Frustrated Phrases
+    - you're not helpful
+    - you're useless
+    - i'm stuck
+    - this isn't working
+    - i don't like this
+    - you're annoying
+    - i want to speak to a human
+    - you're boring
+    - this is stupid
+    - i'm leaving
+    - I want to talk to a human
+    - I am annoyed
+    - Don't waste my time
+    - i'm angry
+    - i want to talk to a person
+
+    # Miscellaneous Conversation
+    - good
+    - great
+    - okay
+    - thanks
+    - thank you
+    - no problem
+    - you're welcome
+    - i am fine
+    - i am doing good
+    - fine
+    - i'm good
+    - im great
+    - thanks a lot
+    - thanks for your help
+    - you are great
+    - you are smart
+    - you are clever
+    - you're very helpful
+    - nice one
+    - cool
+    - awesome
+    - amazing
+    - wonderful
+    - perfect
+    - great to hear
+    - lovely
+    - brilliant
+    - what about you
+    - how about you
+    - what are you up to
+    - what's new
+    - what's been happening
+    - what's your personality
+    - do you like people
+    - do you have a heart
+    - do you have feelings
+    - are you single
+    - will you marry me
+    - do you like me
+    - i love you
+    - you are beautiful
+    - you are handsome
+    - you are gorgeous
+    - how do you do
+    - what's your job
+    - what do you do
+    - what is your work
+    - have you heard of
+    - can you help me with a question
+    - i have a query
+    - i have a doubt
+    - please help me with this
+    - what is your opinion on that
+    - i have a question
+    - can you help me with a question
+    - can you answer this
+    - what can you tell me about
+    - I am happy
+    - I am sad
+    - I am unhappy
+    - I am disappointed
+    - I am feeling good
+    - I am feeling well
+    - I don't feel good
+    - I am not feeling well
+    - I am okay
+    - So so
+    - I am fine
+    - I'm sick
+    - I'm not feeling well
+    - I'm in a good mood
+    - I'm in a bad mood
+    - I'm upset
+    - I'm heartbroken
+    - I am feeling sad
+    - I am happy
+    - I am in a good mood
+    - I'm in a bad mood
+    - I am feeling great
+    - I feel terrible
+    - I'm tired
+    - I'm exhausted
+    - I'm stressed
+    - I'm bored
+    - I'm lonely
+    - I feel lonely
+    - I am alone
+    - I feel alone
+    - I need a friend
+    - can you be my friend
+    - I need some help
+    - Can you help me
+    - I need to talk to someone
+    - I want to talk
+    - I want to talk with you
+    - can we talk
+    - I want to chat
+    - Let's chat
+    - Let's talk
+    - talk to me
+    - talk to me now
+    - talk to me later
+    - talk to me please
+    - let me talk to you
+    - I need to tell you something
+    - Can I tell you something
+    - can I ask you something
+    - can I ask a question
+    - i want to ask a question
+    - i want to ask you something
+    - will you help me
+    - please help me
+    - help me out
+    - i am in trouble
+    - i need help
+    - i am not okay
+    - i am not good
+    - i am confused
+    - i am very confused
+    - i don't understand you
+    - i didn't understand you
+    - i can't understand you
+    - what does that mean
+    - what does it mean
+    - what did you say
+    - i want to know more
+    - tell me about more
+    - tell me something new
+    - i want to know more about this
+    - tell me something I don't know
+    - teach me something
+    - what is this
+    - what is that
+    - what's this
+    - what's that
+    - what is your personality
+    - what are you like
+    - what is your nature
+    - what are your characteristics
+    - what is your mood today
+    - what is your mood
+    - are you in a good mood
+    - are you in a bad mood
+    - are you happy
+    - are you sad
+    - are you upset
+    - are you fine
+    - are you okay
+    - are you good
+    - are you bad
+    - are you
+    - you are
+    - you look
+    - you sound
+    - you seem
+    - you feel
+    - you seem like a good person
+    - you seem like a bad person
+    - you seem friendly
+    - you seem unfriendly
+    - you sound nice
+    - you sound mean
+    - you sound happy
+    - you sound sad
+    - you are a good chatbot
+    - you are a bad chatbot
+    - you are a good bot
+    - you are a bad bot
+    - you are a good assistant
+    - you are a bad assistant
+    - you are a great assistant
+    - you are a terrible assistant
+    - you are a helpful assistant
+    - you are a unhelpful assistant
+    - thank you for your help
+    - thank you for helping me
+    - thank you very much
+    - thanks a lot
+    - I appreciate your help
+    - I appreciate it
+    - you are welcome
+    - it was nothing
+    - you're welcome
+    - no problem
+    - sure thing
+    - my pleasure
+    - you're welcome anytime
+    - don't mention it
+    - it's all good
+    - it's no trouble
+    - happy to help
+    - glad to help
+    - no worries
+    - i need to go
+    - gotta go
+    - bye bye
+    - good bye
+    - see you later
+    - see you soon
+    - talk to you later
+    - talk to you soon
+    - bye for now
+    - so long
+    - have a nice day
+    - have a great day
+    - have a good day
+    - have a great time
+    - have a good time
+    - take care
+    - bye
+    - goodbye
+    - cya
+    - later
+    - see ya
+    - adios
+    - toodle-oo
+    - fare thee well
+    - fare well
+    - aloha
+    - namaste
+    - ciao
+    - peace
+    - see you
+    - catch you later
+    - until next time
+    - so long
+    - good night
+    - peace out
+    - I have to go
+    - I'm leaving
+    - I'm off
+    - bye now
+    - I have a question
+    - can you help me with a question
+    - can you answer a question
+    - i have a question for you
+    - i have one more question
+    - i want to ask a question
+    - i want to ask you a question
+    - can i ask you a question
+    - i have some questions
+    - can i ask some questions
+    - i have a doubt
+    - i have a query
+    - what is a chatbot
+    - what is an intent based chatbot
+    - what is a chatbot dataset
+    - what is nlp
+    - can you tell me about ai
+    - what is ai
+    - tell me about machine learning
+    - what is machine learning
+    - what is deep learning
+    - what is a neural network
+    - what is a transformer model
+    - what is a dataset
+    - what is a chatbot dataset
+    - what is nlu
+    - what are intents
+    - what are entities
+    - what is a story in rasa
+    - what is a rule in rasa
+    - what is a rasa model
+    - what is a rasa project
+    - what is a rasa action
+    - what is a rasa form
+    - what is a slot in rasa
+    - what is a domain file
+    - what is a config file
+    - what are rasa policies
+    - how to train a rasa model
+    - how to run rasa
+    - how to test rasa
+    - rasa shell
+    - rasa train
+    - rasa run
+    - rasa test
+    - rasa validate
+    - rasa data
+    - what is rasa x
+    - what is rasa open source
+    - what is rasa enterprise
+    - what is rasa platform
+    - what is rasa studio
+    - what are the best chatbots
+    - what are the best ai chatbots
+    - what are some famous chatbots
+    - who made you
+    - who is your developer
+    - who is your creator
+    - who is your boss
+    - who is your owner
+    - who is your team
+    - who is your company
+    - what company are you from
+    - what is your company
+    - what is your brand
+    - what is your logo
+    - what is your slogan
+    - what is your mission
+    - what is your vision
+    - what is your purpose
+    - what is your goal
+    - what is your aim
+    - what is your objective
+    - what is your ambition
+    - what is your desire
+    - what is your dream
+    - what is your hope
+    - what is your aspiration
+    - what is your wish
+    - how can you help me
+    - what can you do for me
+    - what are your capabilities
+    - what are your features
+    - what are your functions
+    - what are your abilities
+    - what are your skills
+    - what are your powers
+    - what are you good at
+    - what are you bad at
+    - what are your strengths
+    - what are your weaknesses
+    - what are your limitations
+    - what can you not do
+    - what are your limitations
+    - what can't you do
+    - can you do everything
+    - are you perfect
+    - are you infallible
+    - can you make mistakes
+    - do you make mistakes
+    - what if you make a mistake
+    - what if you make an error
+    - what if you are wrong
+    - what if you are incorrect
+    - what if you are right
+    - what if you are correct
+    - what if you are lying
+    - what if you are telling the truth
+    - what if you are honest
+    - what if you are dishonest
+    - what if you are fake
+    - what if you are real
+    - are you real
+    - are you fake
+    - are you lying
+    - are you telling the truth
+    - are you honest
+    - are you dishonest
+    - are you trustworthy
+    - are you untrustworthy
+    - do you trust me
+    - do you believe me
+    - do you believe in me
+    - do you like me
+    - what do you think of me
+    - what is your opinion of me
+    - do you have an opinion
+    - are you a person
+    - are you an animal
+    - are you a plant
+    - are you a thing
+    - what are you made of
+    - what is your brain made of
+    - what is your hardware
+    - what is your software
+    - what is your code
+    - what language are you written in
+    - what is your native language
+    - what languages can you speak
+    - what languages do you understand
+    - can you speak spanish
+    - can you speak french
+    - can you speak german
+    - can you speak hindi
+    - can you speak chinese
+    - can you speak japanese
+    - can you speak korean
+    - can you speak italian
+    - can you speak portuguese
+    - can you speak russian
+    - can you speak arabic
+    - can you speak urdu
+    - can you speak marathi
+    - can you speak punjabi
+    - can you speak telugu
+    - can you speak tamil
+    - can you speak kannada
+    - can you speak bengali
+    - can you speak malayalam
+    - can you speak gujarati
+    - can you speak assamese
+    - can you speak odia
+    - can you speak sanskrit
+    - can you speak latin
+    - can you speak ancient greek
+    - do you dream
+    - do you sleep
+    - do you have a soul
+    - do you have a spirit
+    - do you have a conscience
+    - do you have a mind
+    - do you have a brain
+    - do you have a body
+    - do you have a heart
+    - do you have a personality
+    - do you have feelings
+    - are you happy
+    - are you sad
+    - are you lonely
+    - are you in a good mood
+    - are you in a bad mood
+    - are you stressed
+    - are you tired
+    - are you hungry
+    - are you thirsty
+    - do you need anything
+    - are you ok
+    - are you alright
+    - are you sure
+    - are you certain
+    - are you positive
+    - are you negative
+    - are you ready
+    - are you prepared
+    - are you busy
+    - are you free
+    - are you available
+    - are you busy right now
+    - are you busy later
+    - are you busy tomorrow
+    - are you busy this week
+    - are you busy this month
+    - are you busy this year
+    - what do you do in your free time
+    - what do you do for fun
+    - what are your hobbies
+    - what do you like to do
+    - what is your favorite thing to do
+    - what is your least favorite thing to do
+    - what is your favorite color
+    - what is your least favorite color
+    - what is your favorite food
+    - what is your least favorite food
+    - what is your favorite drink
+    - what is your least favorite drink
+    - what is your favorite animal
+    - what is your least favorite animal
+    - what is your favorite movie
+    - what is your least favorite movie
+    - what is your favorite song
+    - what is your least favorite song
+    - what is your favorite book
+    - what is your least favorite book
+    - what is your favorite tv show
+    - what is your least favorite tv show
+    - what is your favorite game
+    - what is your least favorite game
+    - what is your favorite place
+    - what is your least favorite place
+    - what is your favorite city
+    - what is your least favorite city
+    - what is your favorite country
+    - what is your least favorite country
+    - what is your favorite person
+    - what is your least favorite person
+    - what is your favorite fictional character
+    - what is your least favorite fictional character
+    - what is your favorite superhero
+    - what is your least favorite superhero
+    - what is your favorite villain
+    - what is your least favorite villain
+    - what is your favorite hero
+    - what is your least favorite hero
+    - what is your favorite villain
+    - what is your least favorite villain
+    - what is your favorite hero
+    - what is your least favorite hero
+    - what is your favorite superhero
+    - what is your least favorite superhero
+    - what is your favorite tv show
+    - what is your least favorite tv show
+    - what is your favorite movie
+    - what is your least favorite movie
+    - what is your favorite book
+    - what is your least favorite book
+    - what is your favorite song
+    - what is your least favorite song
+    - what is your favorite animal
+    - what is your least favorite animal
+    - what is your favorite food
+    - what is your least favorite food
+    - what is your favorite drink
+    - what is your least favorite drink
+    - what is your favorite color
+    - what is your least favorite color
+    - do you like video games
+    - do you like movies
+    - do you like books
+    - do you like music
+    - what is your opinion on a person
+    - what do you think of a person
+    - what is your opinion on a thing
+    - what do you think of a thing
+    - what do you think of an idea
+    - what is your opinion on an idea
+    - what do you think of a concept
+    - what is your opinion on a concept
+    - tell me about a person
+    - tell me about a thing
+    - tell me about an idea
+    - what do you think of an object
+    - what is your opinion on an object
+    - tell me about an object
+    - tell me about a place
+    - tell me about a country
+    - tell me about a city
+    - what is your opinion on a place
+    - what do you think of a place
+    - what is your opinion on a country
+    - what do you think of a country
+    - what is your opinion on a city
+    - what do you think of a city
+    - what is your opinion on a person
+    - what do you think of a person
+    - what is your opinion on an animal
+    - what do you think of an animal
+    - what is your opinion on a plant
+    - what do you think of a plant
+    - what is your opinion on an insect
+    - what do you think of an insect
+    - what is your opinion on a fish
+    - what do you think of a fish
+    - what is your opinion on a bird
+    - what do you think of a bird
+    - what is your opinion on a reptile
+    - what do you think of a reptile
+    - what is your opinion on a mammal
+    - what do you think of a mammal
+    - what is your opinion on an amphibian
+    - what do you think of an amphibian
+    - what is your opinion on a bacteria
+    - what do you think of a bacteria
+    - what is your opinion on a virus
+    - what do you think of a virus
+    - what is your opinion on a fungus
+    - what do you think of a fungus
+    - what is your opinion on a protist
+    - what do you think of a protist
+    - what is your opinion on an archaea
+    - what do you think of an archaea
+    - what is your opinion on a human
+    - what do you think of a human
+    - what is your opinion on a dog
+    - what do you think of a dog
+    - what is your opinion on a cat
+    - what do you think of a cat
+    - what is your opinion on a bird
+    - what do you think of a bird
+    - what is your opinion on a fish
+    - what do you think of a fish
+    - what is your opinion on a snake
+    - what do you think of a snake
+    - what is your opinion on a tree
+    - what do you think of a tree
+    - what is your opinion on a flower
+    - what do you think of a flower
+    - what is your opinion on a rock
+    - what do you think of a rock
+    - what is your opinion on water
+    - what do you think of water
+    - what is your opinion on air
+    - what do you think of air
+    - what is your opinion on fire
+    - what do you think of fire
+    - what is your opinion on an element
+    - what do you think of an element
+    - what is your opinion on a compound
+    - what do you think of a compound
+    - what is your opinion on a molecule
+    - what do you think of a molecule
+    - what is your opinion on an atom
+    - what do you think of an atom
+    - what is your opinion on a proton
+    - what do you think of a proton
+    - what is your opinion on a neutron
+    - what do you think of a neutron
+    - what is your opinion on an electron
+    - what do you think of an electron
+    - what is your opinion on a quark
+    - what do you think of a quark
+    - what is your opinion on a lepton
+    - what do you think of a lepton
+    - what is your opinion on a boson
+    - what do you think of a boson
+    - what is your opinion on a fermion
+    - what do you think of a fermion
+    - what is your opinion on a particle
+    - what do you think of a particle
+    - what is your opinion on a quantum
+    - what do you think of a quantum
+    - what is your opinion on a field
+    - what do you think of a field
+    - what is your opinion on a wave
+    - what do you think of a wave
+    - what is your opinion on a light
+    - what do you think of light
+    - what is your opinion on a sound
+    - what do you think of sound
+    - what is your opinion on a color
+    - what do you think of color
+    - what is your opinion on a flavor
+    - what do you think of flavor
+    - what is your opinion on a scent
+    - what do you think of a scent
+    - what is your opinion on a taste
+    - what do you think of a taste
+    - what is your opinion on a texture
+    - what do you think of a texture
+    - what is your opinion on a feeling
+    - what do you think of a feeling
+    - what is your opinion on an emotion
+    - what do you think of an emotion
+    - what is your opinion on a thought
+    - what do you think of a thought
+    - what is your opinion on an idea
+    - what do you think of an idea
+    - what is your opinion on a concept
+    - what do you think of a concept
+    - what is your opinion on a theory
+    - what do you think of a theory
+    - what is your opinion on a hypothesis
+    - what do you think of a hypothesis
+    - what is your opinion on a law
+    - what do you think of a law
+    - what is your opinion on a principle
+    - what do you think of a principle
+    - what is your opinion on a rule
+    - what do you think of a rule
+    - what is your opinion on a guideline
+    - what do you think of a guideline
+    - what is your opinion on a standard
+    - what do you think of a standard
+    - what is your opinion on a norm
+    - what do you think of a norm
+    - what is your opinion on a custom
+    - what do you think of a custom
+    - what is your opinion on a tradition
+    - what do you think of a tradition
+    - what is your opinion on a ritual
+    - what do you think of a ritual
+    - what is your opinion on a ceremony
+    - what do you think of a ceremony
+    - what is your opinion on a celebration
+    - what do you think of a celebration
+    - what is your opinion on a festival
+    - what do you think of a festival
+    - what is your opinion on a holiday
+    - what do you think of a holiday
+    - what is your opinion on a belief
+    - what do you think of a belief
+    - what is your opinion on a value
+    - what do you think of a value
+    - what is your opinion on a moral
+    - what do you think of a moral
+    - what is your opinion on an ethic
+    - what do you think of an ethic
+    - what is your opinion on a virtue
+    - what do you think of a virtue
+    - what is your opinion on a vice
+    - what do you think of a vice
+    - what is your opinion on a sin
+    - what do you think of a sin
+    - what is your opinion on a crime
+    - what do you think of a crime
+    - what is your opinion on a punishment
+    - what do you think of a punishment
+    - what is your opinion on a reward
+    - what do you think of a reward
+    - what is your opinion on a consequence
+    - what do you think of a consequence
+    - what is your opinion on a cause
+    - what do you think of a cause
+    - what is your opinion on an effect
+    - what do you think of an effect
+    - what is your opinion on a reason
+    - what do you think of a reason
+    - what is your opinion on a justification
+    - what do you think of a justification
+    - what is your opinion on an excuse
+    - what do you think of an excuse
+    - what is your opinion on a motive
+    - what do you think of a motive
+    - what is your opinion on a goal
+    - what do you think of a goal
+    - what is your opinion on a purpose
+    - what do you think of a purpose
+    - what is your opinion on an aim
+    - what do you think of an aim
+    - what is your opinion on an objective
+    - what do you think of an objective
+    - what is your opinion on an ambition
+    - what do you think of an ambition
+    - what is your opinion on a desire
+    - what do you think of a desire
+    - what is your opinion on a wish
+    - what do you think of a wish
+    - what is your opinion on a dream
+    - what do you think of a dream
+    - what is your opinion on a hope
+    - what do you think of a hope
+    - what is your opinion on an aspiration
+    - what do you think of an aspiration
+    - what is your opinion on a need
+    - what do you think of a need
+    - what is your opinion on a want
+    - what do you think of a want
+    - what is your opinion on a lack
+    - what do you think of a lack
+    - what is your opinion on an absence
+    - what do you think of an absence
+    - what is your opinion on a presence
+    - what do you think of a presence
+    - what is your opinion on an existence
+    - what do you think of an existence
+    - what is your opinion on a reality
+    - what do you think of a reality
+    - what is your opinion on a truth
+    - what do you think of a truth
+    - what is your opinion on a lie
+    - what do you think of a lie
+    - what is your opinion on an illusion
+    - what do you think of an illusion
+    - what is your opinion on a deception
+    - what do you think of a deception
+    - what is your opinion on a fantasy
+    - what do you think of a fantasy
+    - what is your opinion on a dream
+    - what do you think of a dream
+    - what is your opinion on a nightmare
+    - what do you think of a nightmare
+    - what is your opinion on a fear
+    - what do you think of a fear
+    - what is your opinion on a courage
+    - what do you think of a courage
+    - what is your opinion on a bravery
+    - what do you think of a bravery
+    - what is your opinion on a cowardice
+    - what do you think of a cowardice
+    - what is your opinion on a boldness
+    - what do you think of a boldness
+    - what is your opinion on a shyness
+    - what do you think of a shyness
+    - what is your opinion on a confidence
+    - what do you think of a confidence
+    - what is your opinion on a doubt
+    - what do you think of a doubt
+    - what is your opinion on a trust
+    - what do you think of a trust
+    - what is your opinion on a faith
+    - what do you think of a faith
+    - what is your opinion on a hope
+    - what do you think of a hope
+    - what is your opinion on a despair
+    - what do you think of a despair
+    - what is your opinion on a joy
+    - what do you think of a joy
+    - what is your opinion on a sadness
+    - what do you think of a sadness
+    - what is your opinion on a happiness
+    - what do you think of a happiness
+    - what is your opinion on an unhappiness
+    - what do you think of an unhappiness
+    - what is your opinion on a love
+    - what do you think of a love
+    - what is your opinion on a hate
+    - what do you think of a hate
+    - what is your opinion on an affection
+    - what do you think of an affection
+    - what is your opinion on a disgust
+    - what do you think of a disgust
+    - what is your opinion on an anger
+    - what do you think of an anger
+    - what is your opinion on a rage
+    - what do you think of a rage
+    - what is your opinion on a fury
+    - what do you think of a fury
+    - what is your opinion on a wrath
+    - what do you think of a wrath
+    - what is your opinion on a resentment
+    - what do you think of a resentment
+    - what is your opinion on a contempt
+    - what do you think of a contempt
+    - what is your opinion on a jealousy
+    - what do you think of a jealousy
+    - what is your opinion on an envy
+    - what do you think of an envy
+    - what is your opinion on a pity
+    - what do you think of a pity
+    - what is your opinion on a sympathy
+    - what do you think of a sympathy
+    - what is your opinion on a compassion
+    - what do you think of a compassion
+    - what is your opinion on a pride
+    - what do you think of a pride
+    - what is your opinion on a shame
+    - what do you think of a shame
+    - what is your opinion on an embarrassment
+    - what do you think of an embarrassment
+    - what is your opinion on an excitement
+    - what do you think of an excitement
+    - what is your opinion on an enthusiasm
+    - what do you think of an enthusiasm
+    - what is your opinion on a passion
+    - what do you think of a passion
+    - what is your opinion on a calm
+    - what do you think of a calm
+    - what is your opinion on a peace
+    - what do you think of a peace
+    - what is your opinion on a serenity
+    - what do you think of a serenity
+    - what is your opinion on a tranquility
+    - what do you think of a tranquility
+    - what is your opinion on a surprise
+    - what do you think of a surprise
+    - what is your opinion on a shock
+    - what do you think of a shock
+    - what is your opinion on a wonder
+    - what do you think of a wonder
+    - what is your opinion on a awe
+    - what do you think of a awe
+    - what is your opinion on a disgust
+    - what do you think of a disgust
+    - what is your opinion on a revulsion
+    - what do you think of a revulsion
+    - what is your opinion on an apprehension
+    - what do you think of an apprehension
+    - what is your opinion on a fear
+    - what do you think of a fear
+    - what is your opinion on a terror
+    - what do you think of a terror
+    - what is your opinion on a dread
+    - what do you think of a dread
+    - what is your opinion on a horror
+    - what do you think of a horror
+    - what is your opinion on an anxiety
+    - what do you think of an anxiety
+    - what is your opinion on a nervousness
+    - what do you think of a nervousness
+    - what is your opinion on a tension
+    - what do you think of a tension
+    - what is your opinion on a stress
+    - what do you think of a stress
+    - what is your opinion on an anger
+    - what do you think of an anger
+    - what is your opinion on a rage
+    - what do you think of a rage
+    - what is your opinion on a fury
+    - what do you think of a fury
+    - what is your opinion on a resentment
+    - what do you think of a resentment
+    - what is your opinion on a contempt
+    - what do you think of a contempt
+    - what is your opinion on a jealousy
+    - what do you think of a jealousy
+    - what is your opinion on an envy
+    - what do you think of an envy
+    - what is your opinion on a pity
+    - what do you think of a pity
+    - what is your opinion on a sympathy
+    - what do you think of a sympathy
+    - what is your opinion on a compassion
+    - what do you think of a compassion
+    - what is your opinion on a pride
+    - what do you think of a pride
+    - what is your opinion on a shame
+    - what do you think of a shame
+    - what is your opinion on an embarrassment
+    - what do you think of an embarrassment
+    - what is your opinion on an excitement
+    - what do you think of an excitement
+    - what is your opinion on an enthusiasm
+    - what do you think of an enthusiasm
+    - what is your opinion on a passion
+    - what do you think of a passion
+    - what is your opinion on a calm
+    - what do you think of a calm
+    - what is your opinion on a peace
+    - what do you think of a peace
+    - what is your opinion on a serenity
+    - what do you think of a serenity
+    - what is your opinion on a tranquility
+    - what do you think of a tranquility
+    - what is your opinion on a surprise
+    - what do you think of a surprise
+    - what is your opinion on a shock
+    - what do you think of a shock
+    - what is your opinion on a wonder
+    - what do you think of a wonder
+    - what is your opinion on a awe
+    - what do you think of a awe
+    - what is your opinion on a disgust
+    - what do you think of a disgust
+    - what is your opinion on a revulsion
+    - what do you think of a revulsion
+    - what is your opinion on an apprehension
+    - what do you think of an apprehension
+    - what is your opinion on a fear
+    - what do you think of a fear
+    - what is your opinion on a terror
+    - what do you think of a terror
+    - what is your opinion on a dread
+    - what do you think of a dread
+    - what is your opinion on a horror
+    - what do you think of a horror
+    - what is your opinion on an anxiety
+    - what do you think of an anxiety
+    - what is your opinion on a nervousness
+    - what do you think of a nervousness
+    - what is your opinion on a tension
+    - what do you think of a tension
+    - what is your opinion on a stress
+    - what do you think of a stress
+    - what is your opinion on an anger
+    - what do you think of an anger
+    - what is your opinion on a rage
+    - what do you think of a rage
+    - what is your opinion on a fury
+    - what do you think of a fury
+    - what is your opinion on a resentment
+    - what do you think of a resentment
+    - what is your opinion on a contempt
+    - what do you think of a contempt
+    - what is your opinion on a jealousy
+    - what do you think of a jealousy
+    - what is your opinion on an envy
+    - what do you think of an envy
+    - what is your opinion on a pity
+    - what do you think of a pity
+    - what is your opinion on a sympathy
+    - what do you think of a sympathy
+    - what is your opinion on a compassion
+    - what do you think of a compassion
+    - what is your opinion on a pride
+    - what do you think of a pride
+    - what is your opinion on a shame
+    - what do you think of a shame
+    - what is your opinion on an embarrassment
+    - what do you think of an embarrassment
+    - what is your opinion on an excitement
+    - what do you think of an excitement
+    - what is your opinion on an enthusiasm
+    - what do you think of an enthusiasm
+    - what is your opinion on a passion
+    - what do you think of a passion
+    - what is your opinion on a calm
+    - what do you think of a calm
+    - what is your opinion on a peace
+    - what do you think of a peace
+    - what is your opinion on a serenity
+    - what do you think of a serenity
+    - what is your opinion on a tranquility
+    - what do you think of a tranquility
+    - what is your opinion on a surprise
+    - what do you think of a surprise
+    - what is your opinion on a shock
+    - what do you think of a shock
+    - what is your opinion on a wonder
+    - what do you think of a wonder
+    - what is your opinion on a awe
+    - what do you think of a awe
+    - what is your opinion on a disgust
+    - what do you think of a disgust
+    - what is your opinion on a revulsion
+    - what do you think of a revulsion
+    - what is your opinion on an apprehension
+    - what do you think of an apprehension
+    - what is your opinion on a fear
+    - what do you think of a fear
+    - what is your opinion on a terror
+    - what do you think of a terror
+    - what is your opinion on a dread
+    - what do you think of a dread
+    - what is your opinion on a horror
+    - what do you think of a horror
+    - what is your opinion on an anxiety
+    - what do you think of an anxiety
+    - what is your opinion on a nervousness
+    - what do you think of a nervousness
+    - what is your opinion on a tension
+    - what do you think of a tension
+    - what is your opinion on a stress
+    - what do you think of a stress
+    - what is your opinion on an anger
+    - what do you think of an anger
+    - what is your opinion on a rage
+    - what do you think of a rage
+    - what is your opinion on a fury
+    - what do you think of a fury
+    - what is your opinion on a resentment
+    - what do you think of a resentment
+    - what is your opinion on a contempt
+    - what do you think of a contempt
+    - what is your opinion on a jealousy
+    - what do you think of a jealousy
+    - what is your opinion on an envy
+    - what do you think of an envy
+    - what is your opinion on a pity
+    - what do you think of a pity
+    - what is your opinion on a sympathy
+    - what do you think of a sympathy
+    - what is your opinion on a compassion
+    - what do you think of a compassion
+    - what is your opinion on a pride
+    - what do you think of a pride
+    - what is your opinion on a shame
+    - what do you think of a shame
+    - what is your opinion on an embarrassment
+    - what do you think of an embarrassment
+    - what is your opinion on an excitement
+    - what do you think of an excitement
+    - what is your opinion on an enthusiasm
+    - what do you think of an enthusiasm
+    - what is your opinion on a passion
+    - what do you think of a passion
+    - what is your opinion on a calm
+    - what do you think of a calm
+    - what is your opinion on a peace
+    - what do you think of a peace
+    - what is your opinion on a serenity
+    - what do you think of a serenity
+    - what is your opinion on a tranquility
+    - what do you think of a tranquility
+    - what is your opinion on a surprise
+    - what do you think of a surprise
+    - what is your opinion on a shock
+    - what do you think of a shock
+    - what is your opinion on a wonder
+    - what do you think of a wonder
+    - what is your opinion on a awe
+    - what do you think of a awe
+    - what is your opinion on a disgust
+    - what do you think of a disgust
+    - what is your opinion on a revulsion
+    - what do you think of a revulsion
+    - what is your opinion on an apprehension
+    - what do you think of an apprehension
+    - what is your opinion on a fear
+    - what do you think of a fear
+    - what is your opinion on a terror
+    - what do you think of a terror
+    - what is your opinion on a dread
+    - what do you think of a dread
+    - what is your opinion on a horror
+    - what do you think of a horror
+    - what is your opinion on an anxiety
+    - what do you think of an anxiety
+    - what is your opinion on a nervousness
+    - what do you think of a nervousness
+    - what is your opinion on a tension
+    - what do you think of a tension
+    - what is your opinion on a stress
+    - what do you think of a stress
+    - what is your opinion on an anger
+    - what do you think of an anger
+    - what is your opinion on a rage
+    - what do you think of a rage
+    - what is your opinion on a fury
+    - what do you think of a fury
+    - what is your opinion on a resentment
+    - what do you think of a resentment
+    - what is your opinion on a contempt
+    - what do you think of a contempt
+    - what is your opinion on a jealousy
+    - what do you think of a jealousy
+    - what is your opinion on an envy
+    - what do you think of an envy
+    - what is your opinion on a pity
+    - what do you think of a pity
+    - what is your opinion on a sympathy
+    - what do you think of a sympathy
+    - what is your opinion on a compassion
+    - what do you think of a compassion
+    - what is your opinion on a pride
+    - what do you think of a pride
+    - what is your opinion on a shame
+    - what do you think of a shame
+    - what is your opinion on an embarrassment
+    - what do you think of an embarrassment
+    - what is your opinion on an excitement
+    - what do you think of an excitement
+    - what is your opinion on an enthusiasm
+    - what do you think of an enthusiasm
+    - what is your opinion on a passion
+    - what do you think of a passion
+    - what is your opinion on a calm
+    - what do you think of a calm
+    - what is your opinion on a peace
+    - what do you think of a peace
+    - what is your opinion on a serenity
+    - what do you think of a serenity
+    - what is your opinion on a tranquility
+    - what do you think of a tranquility
+    - what is your opinion on a surprise
+    - what do you think of a surprise
+    - what do you think of a shock
+    - what do you think of a shock
+    - what is your opinion on a wonder
+    - what do you think of a wonder
+    - what is your opinion on a awe
+    - what do you think of a awe
+    - what is your opinion on a disgust
+    - what do you think of a disgust
+    - what is your opinion on a revulsion
+    - what do you think of a revulsion
+    - what is your opinion on an apprehension
+    - what do you think of an apprehension
+    - what is your opinion on a fear
+    - what do you think of a fear
+    - what is your opinion on a terror
+    - what do you think of a terror
+    - what is your opinion on a dread
+    - what do you think of a dread
+    - what is your opinion on a horror
+    - what do you think of a horror
+    - what is your opinion on an anxiety
+    - what do you think of an anxiety
+    - what is your opinion on a nervousness
+    - what do you think of a nervousness
+    - what is your opinion on a tension
+    - what do you think of a tension
+    - what is your opinion on a stress
+    - what do you think of a stress
+    - what is your opinion on an anger
+    - what do you think of an anger
+    - what is your opinion on a rage
+    - what do you think of a rage
+    - what is your opinion on a fury
+    - what do you think of a fury
+    - what is your opinion on a resentment
+    - what do you think of a resentment
+    - what is your opinion on a contempt
+    - what do you think of a contempt
+    - what is your opinion on a jealousy
+    - what do you think of a jealousy
+    - what is your opinion on an envy
+    - what do you think of an envy
+    - what is your opinion on a pity
+    - what do you think of a pity
+    - what is your opinion on a sympathy
+    - what do you think of a sympathy
+    - what is your opinion on a compassion
+    - what do you think of a compassion
+    - what is your opinion on a pride
+    - what do you think of a pride
+    - what is your opinion on a shame
+    - what do you think of a shame
+    - what is your opinion on an embarrassment
+    - what do you think of an embarrassment
+    - what is your opinion on an excitement
+    - what do you think of an excitement
+    - what is your opinion on an enthusiasm
+    - what do you think of an enthusiasm
+    - what is your opinion on a passion
+    - what do you think of a passion
+    - what is your opinion on a calm
+    - what do you think of a calm
+    - what is your opinion on a peace
+    - what do you think of a peace
+    - what is your opinion on a serenity
+    - what do you think of a serenity
+    - what is your opinion on a tranquility
+    - what do you think of a tranquility
+    - what is your opinion on a surprise
+    - what do you think of a surprise
+    - what do you think of a shock
+    - what do you think of a shock
+    - what is your opinion on a wonder
+    - what do you think of a wonder
+    - what is your opinion on a awe
+    - what do you think of a awe
+    - what is your opinion on a disgust
+    - what do you think of a disgust
+    - what is your opinion on a revulsion
+    - what do you think of a revulsion
+    - what is your opinion on an apprehension
+    - what do you think of an apprehension
+    - what is your opinion on a fear
+    - what do you think of a fear
+    - what is your opinion on a terror
+    - what do you think of a terror
+    - what is your opinion on a dread
+    - what do you think of a dread
+    - what is your opinion on a horror
+    - what do you think of a horror
+    - what is your opinion on an anxiety
+    - what do you think of an anxiety
+    - what is your opinion on a nervousness
+    - what do you think of a nervousness
+    - what is your opinion on a tension
+    - what do you think of a tension
+    - what is your opinion on a stress
+    - what do you think of a stress
+    - what is your opinion on an anger
+    - what do you think of an anger
+    - what is your opinion on a rage
+    - what do you think of a rage
+    - what is your opinion on a fury
+    - what do you think of a fury
+    - what is your opinion on a resentment
+    - what do you think of a resentment
+    - what is your opinion on a contempt
+    - what do you think of a contempt
+    - what is your opinion on a jealousy
+    - what do you think of a jealousy
+    - what is your opinion on an envy
+    - what do you think of an envy
+    - what is your opinion on a pity
+    - what do you think of a pity
+    - what is your opinion on a sympathy
+    - what do you think of a sympathy
+    - what is your opinion on a compassion
+    - what do you think of a compassion
+    - what is your opinion on a pride
+    - what do you think of a pride
+    - what is your opinion on a shame
+    - what do you think of a shame
+    - what is your opinion on an embarrassment
+    - what do you think of an embarrassment
+    - what is your opinion on an excitement
+    - what do you think of an excitement
+    - what is your opinion on an enthusiasm
+    - what do you think of an enthusiasm
+    - what is your opinion on a passion
+    - what do you think of a passion
+    - what is your opinion on a calm
+    - what do you think of a calm
+    - what is your opinion on a peace
+    - what do you think of a peace
+    - what is your opinion on a serenity
+    - what do you think of a serenity
+    - what is your opinion on a tranquility
+    - what do you think of a tranquility
+    - what is your opinion on a surprise
+    - what do you think of a surprise
+    - what do you think of a shock
+    - what do you think of a shock
+    - what is your opinion on a wonder
+    - what do you think of a wonder
+    - what is your opinion on a awe
+    - what do you think of a awe
+    - what is your opinion on a disgust
+    - what do you think of a disgust
+    - what is your opinion on a revulsion
+    - what do you think of a revulsion
+    - what is your opinion on an apprehension
+    - what do you think of an apprehension
+    - what is your opinion on a fear
+    - what do you think of a fear
+    - what is your opinion on a terror
+    - what do you think of a terror
+    - what is your opinion on a dread
+    - what do you think of a dread
+    - what is your opinion on a horror
+    - what do you think of a horror
+    - what is your opinion on an anxiety
+    - what do you think of an anxiety
+    - what is your opinion on a nervousness
+    - what do you think of a nervousness
+    - what is your opinion on a tension
+    - what do you think of a tension
+    - what is your opinion on a stress
+    - what do you think of a stress
+    - what is your opinion on an anger
+    - what do you think of an anger
+    - what is your opinion on a rage
+    - what do you think of a rage
+    - what is your opinion on a fury
+    - what do you think of a fury
+    - what is your opinion on a resentment
+    - what do you think of a resentment
+    - what is your opinion on a contempt
+    - what do you think of a contempt
+    - what is your opinion on a jealousy
+    - what do you think of a jealousy
+    - what is your opinion on an envy
+    - what do you think of an envy
+    - what is your opinion on a pity
+    - what do you think of a pity
+    - what is your opinion on a sympathy
+    - what do you think of a sympathy
+    - what is your opinion on a compassion
+    - what do you think of a compassion
+    - what is your opinion on a pride
+    - what do you think of a pride
+    - what is your opinion on a shame
+    - what do you think of a shame
+    - what is your opinion on an embarrassment
+    - what do you think of an embarrassment
+    - what is your opinion on an excitement
+    - what do you think of an excitement
+    - what is your opinion on an enthusiasm
+    - what do you think of an enthusiasm
+    - what is your opinion on a passion
+    - what do you think of a passion
+    - what is your opinion on a calm
+    - what do you think of a calm
+    - what is your opinion on a peace
+    - what do you think of a peace
+    - what is your opinion on a serenity
+    - what do you think of a serenity
+    - what is your opinion on a tranquility
+    - what do you think of a tranquility
+    - what is your opinion on a surprise
+    - what do you think of a surprise
+    - what do you think of a shock
+    - what do you think of a shock
+    - what is your opinion on a wonder
+    - what do you think of a wonder
+    - what is your opinion on a awe
+    - what do you think of a awe
+    - what is your opinion on a disgust
+    - what do you think of a disgust
+    - what is your opinion on a revulsion
+    - what do you think of a revulsion
+    - what is your opinion on an apprehension
+    - what do you think of an apprehension
+    - what is your opinion on a fear
+    - what do you think of a fear
+    - what is your opinion on a terror
+    - what do you think of a terror
+    - what is your opinion on a dread
+    - what do you think of a dread
+    - what is your opinion on a horror
+    - what do you think of a horror
+    - what is your opinion on an anxiety
+    - what do you think of an anxiety
+    - what is your opinion on a nervousness
+    - what do you think of a nervousness
+    - what is your opinion on a tension
+    - what do you think of a tension
+    - what is your opinion on a stress
+    - what do you think of a stress
+    - what is your opinion on an anger
+    - what do you think of an anger
+    - what is your opinion on a rage
+    - what do you think of a rage
+    - what is your opinion on a fury
+    - what do you think of a fury
+    - what is your opinion on a resentment
+    - what do you think of a resentment
+    - what is your opinion on a contempt
+    - what do you think of a contempt
+    - what is your opinion on a jealousy
+    - what do you think of a jealousy
+    - what is your opinion on an envy
+    - what do you think of an envy
+    - what is your opinion on a pity
+    - what do you think of a pity
+    - what is your opinion on a sympathy
+    - what do you think of a sympathy
+    - what is your opinion on a compassion
+    - what do you think of a compassion
+    - what is your opinion on a pride
+    - what do you think of a pride
+    - what is your opinion on a shame
+    - what do you think of a shame
+    - what is your opinion on an embarrassment
+    - what do you think of an embarrassment
+    - what is your opinion on an excitement
+    - what do you think of an excitement
+    - what is your opinion on an enthusiasm
+    - what do you think of an enthusiasm
+    - what is your opinion on a passion
+    - what do you think of a passion
+    - what is your opinion on a calm
+    - what do you think of a calm
+    - what is your opinion on a peace
+    - what do you think of a peace
+    - what is your opinion on a serenity
+    - what do you think of a serenity
+    - what is your opinion on a tranquility
+    - what do you think of a tranquility
+    - what is your opinion on a surprise
+    - what do you think of a surprise
+    - what do you think of a shock
+    - what do you think of a shock
+    - what is your opinion on a wonder
+    - what do you think of a wonder
+    - what is your opinion on a awe
+    - what do you think of a awe
+    - what is your opinion on a disgust
+    - what do you think of a disgust
+    - what is your opinion on a revulsion
+    - what do you think of a revulsion
+    - what is your opinion on an apprehension
+    - what do you think of an apprehension
+    - what is your opinion on a fear
+    - what do you think of a fear
+    - what is your opinion on a terror
+    - what do you think of a terror
+    - what is your opinion on a dread
+    - what do you think of a dread
+    -

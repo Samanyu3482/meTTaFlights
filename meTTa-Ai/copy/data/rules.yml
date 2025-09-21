@@ -1,0 +1,44 @@
+version: "3.1"
+
+rules:
+  - rule: Say goodbye anytime the user says goodbye
+    steps:
+      - intent: goodbye
+      - action: utter_goodbye
+
+  - rule: Say 'I am a bot' anytime the user challenges
+    steps:
+      - intent: bot_challenge
+      - action: utter_iamabot
+  
+  - rule: Flight search rule
+    steps:
+      - intent: find_flight
+      - action: action_find_flight
+
+  - rule: Ask for form fields if form is active
+    condition:
+      - active_loop: booking_form
+    steps:
+      - action: booking_form
+      - active_loop: booking_form
+
+  - rule: Confirm booking after form completion
+    condition:
+      - active_loop: booking_form
+    steps:
+      - action: booking_form
+      - slot_was_set:
+          - requested_slot: null
+      - active_loop: null  # Explicitly deactivate the loop
+      - action: utter_ask_booking_confirmation
+      - intent: affirm
+      - action: action_book_flight
+      - action: utter_booking_confirmed
+      - action: action_listen
+  - rule: Set flight details and start booking
+    steps:
+      - intent: request_booking
+      - action: action_set_flight_details # Run this action first
+      - action: booking_form
+      - active_loop: booking_form

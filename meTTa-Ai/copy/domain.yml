@@ -1,0 +1,136 @@
+version: "3.1"
+
+intents:
+  - greet
+  - goodbye
+  - affirm
+  - deny
+  - mood_great
+  - mood_unhappy
+  - bot_challenge
+  - find_flight
+  - request_booking
+  - provide_credentials
+  - confirm_booking
+  - deny_booking
+
+entities:
+  - source
+  - destination
+  - year
+  - month
+  - day
+  - priority
+  - date
+  - username
+  - mpin
+  - booking_confirmed
+
+slots:
+  flight_info:
+    type: any
+    influence_conversation: false
+    mappings:
+      - type: custom
+  source:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: source
+  destination:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: destination
+  year:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: year
+  month:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: month
+  day:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: day
+  priority:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: priority
+  date:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: date
+  username:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: username
+        intent: provide_credentials
+  mpin:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: mpin
+        intent: provide_credentials
+  booking_confirmed:
+    type: bool
+    influence_conversation: false
+    mappings:
+      - type: custom
+  # Add this new slot
+  user_authenticated:
+    type: bool
+    influence_conversation: false
+    mappings:
+      - type: custom
+
+forms:
+  booking_form:
+    required_slots:
+      - username
+      - mpin
+
+
+responses:
+  utter_greet:
+    - text: "Hey! How are you?"
+  utter_cheer_up:
+    - text: "Here is something to cheer you up:"
+      image: "https://i.imgur.com/nGF1K8f.jpg"
+  utter_did_that_help:
+    - text: "Did that help you?"
+  utter_happy:
+    - text: "Great, carry on!"
+  utter_goodbye:
+    - text: "Bye"
+  utter_iamabot:
+    - text: "I am a bot, powered by Rasa."
+  utter_ask_username:
+    - text: "What is your username?"
+  utter_ask_mpin:
+    - text: "Please enter your MPIN."
+  utter_ask_booking_confirmation:
+    - text: "Would you like to confirm the booking for this flight?"
+  utter_authentication_failed:
+    - text: "Authentication failed. Please check your username and MPIN."
+  utter_booking_confirmed:
+    - text: "Booking confirmed! A confirmation email has been sent."
+  utter_booking_cancelled:
+    - text: "Booking cancelled."
+
+actions:
+  - action_find_flight
+  - action_authenticate_user
+  - action_book_flight
+  - action_set_flight_details 
+
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true
