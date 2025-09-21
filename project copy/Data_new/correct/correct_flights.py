@@ -1,34 +1,46 @@
-def correct_flight_data(input_file_path, output_file_path):
-    """
-    Reads flight data from a file, corrects the month from 08 to 09 for the year 2025,
-    and writes the corrected data to a new file.
+import re
+from datetime import datetime, timedelta
+from collections import defaultdict
 
-    Args:
-        input_file_path (str): The path to the input file (e.g., 'flights_updated.metta').
-        output_file_path (str): The path to the output file where the corrected data will be saved.
-    """
-    try:
-        with open(input_file_path, 'r') as infile, open(output_file_path, 'w') as outfile:
-            for line in infile:
-                # Replace the specific occurrence of ' 08 ' after '2025'
-                corrected_line = line.replace('(flight 2025 08 ', '(flight 2025 09 ')
-                outfile.write(corrected_line)
-        print(f"File successfully processed. Corrected data saved to: {output_file_path}")
+# Input/output files
+input_file = "flights.metta"
+output_file = "flights_updated.metta"
 
-    except FileNotFoundError:
-        print(f"Error: The file '{input_file_path}' was not found.")
-    except Exception as e:
-        print(f"An error occurred: {e}")
+# Date range
+start_date = datetime(2025, 9, 27)
+end_date = datetime(2025, 10, 15)
+date_range = (end_date - start_date).days + 1
 
-# --- How to use the script ---
+# Dictionary to group flights by route (SRC-DEST)
+routes = defaultdict(list)
 
-# 1. Save this code as a Python file (e.g., 'correct_flights.py').
-# 2. Make sure the 'flights_updated.metta' file is in the same directory as the script.
-# 3. Run the script from your terminal using: python correct_flights.py
+# Step 1: Read and group flights by route
+with open(input_file, "r") as f:
+    for line in f:
+        match = re.match(r"\(flight 2025 \d{2} \d{2} (\w+) (\w+) (.+)\)", line.strip())
+        if match:
+            src, dest = match.group(1), match.group(2)
+            routes[(src, dest)].append(line.strip())
 
-# Define the input and output file names
-input_filename = 'flights_updated.metta'
-output_filename = 'flights_corrected.metta'
+# Step 2: Assign new dates evenly across the range
+updated_lines = []
+for (src, dest), flights in routes.items():
+    num_flights = len(flights)
+    for i, flight in enumerate(flights):
+        # Distribute evenly within date range
+        offset = (i * date_range) // num_flights
+        new_date = start_date + timedelta(days=offset)
 
-# Call the function to perform the correction
-correct_flight_data(input_filename, output_filename)
+        # Replace old date with new one
+        updated_line = re.sub(
+            r"\(flight 2025 \d{2} \d{2}",
+            f"(flight 2025 {new_date.strftime('%m %d')}",
+            flight
+        )
+        updated_lines.append(updated_line)
+
+# Step 3: Write output
+with open(output_file, "w") as f:
+    f.write("\n".join(updated_lines))
+
+print("✅ Flights updated and written to", output_file)
