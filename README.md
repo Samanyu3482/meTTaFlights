@@ -8,10 +8,18 @@ A comprehensive flight search and booking platform featuring a modern Next.js fr
 - **Unified Booking System**: Seamless integration between search APIs and booking backend
 - **User Authentication**: Complete login/signup system with JWT tokens
 - **Modern UI**: Beautiful, responsive frontend built with Next.js, Tailwind CSS, and shadcn/ui
-- **Real MeTTa Integration**: Search flights using the MeTTa knowledge base with 50,000+ flight records
+- **Real MeTTa Integration**: Search flights using the MeTTa knowledge base with 75,000+ flight       records and targeting over 103 US airports
 - **Smart Search**: Advanced filtering by source, destination, date, price, and travel preferences
 - **Real-time Results**: Instant search results from multiple search algorithms
 - **Booking Management**: Complete booking workflow with user trip management
+- **Determine Shortest travel time**
+- **Layover Optimization**
+- **Optimized Path Finding Algorithm**: Dijkstra and other python inbuilt sorting
+- **Custom Weighting**: Allow users to prioritize factors such as cost, duration, or number of layovers.
+- **User-Friendly Input System**: Let users specify departure and destination cities while refining search criteria.
+
+
+
 
 ##  System Architecture
 
@@ -22,10 +30,15 @@ A comprehensive flight search and booking platform featuring a modern Next.js fr
 ## Project WorkFlow
 
 <p align="center">
-  <img src="images/u.jpeg" alt="MeTTa Archie" width="100%"/>
+  <img src="images/u.jpg" alt="MeTTa Archie" width="100%"/>
 </p>
 
 
+## Outcomes Achieved
+  1. Graph representation in MeTTa
+  2. Algorithm implementation in MeTTa
+  3. Non deterministic result handling
+  4. Pathfinding algorithms
 
 ##  Prerequisites
 
