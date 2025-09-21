@@ -459,8 +459,9 @@ npm test
 ### Flight Data
 - **Format**: MeTTa knowledge base format
 - **Location**: `project/Data/flights.metta`
-- **Records**: 50,000+ flight records
+- **Records**: 75,000+ flight records
 - **Structure**: `(flight year month day source dest cost takeoff landing)`
+`(flight year month day source dest cost takeoff landing airline_name)`
 
 ### Airport Data
 - **Source**: Extracted from flight dataset
