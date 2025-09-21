@@ -15,48 +15,17 @@ A comprehensive flight search and booking platform featuring a modern Next.js fr
 
 ##  System Architecture
 
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Cheapest API  │    │   Fastest API   │    │ Optimized API   │
-│   (Port 8001)   │    │   (Port 8003)   │    │   (Port 8002)   │
-│                 │    │                 │    │                 │
-│ • Price Focus   │    │ • Time Focus    │    │ • Balanced      │
-│ • Cost Sorting  │    │ • Duration Opt  │    │ • Multi-Factor  │
-│ • Budget Travel │    │ • Speed First   │    │ • Smart Scoring │
-└─────────┬───────┘    └─────────┬───────┘    └─────────┬───────┘
-          │                      │                      │
-          └──────────────────────┼──────────────────────┘
-                                 │
-                    ┌─────────────▼─────────────┐
-                    │   Unified Booking API     │
-                    │      (Port 8005)          │
-                    │                           │
-                    │ • Integration Layer       │
-                    │ • Data Transformation     │
-                    │ • Booking Orchestration   │
-                    │ • User Management         │
-                    └─────────────┬─────────────┘
-                                  │
-                    ┌─────────────▼─────────────┐
-                    │   Backend Auth & Booking  │
-                    │      (Port 8000)          │
-                    │                           │
-                    │ • User Authentication     │
-                    │ • Booking Management      │
-                    │ • Database Operations     │
-                    │ • Session Management      │
-                    └─────────────┬─────────────┘
-                                  │
-                    ┌─────────────▼─────────────┐
-                    │   Next.js Frontend        │
-                    │      (Port 3000)          │
-                    │                           │
-                    │ • User Interface          │
-                    │ • Search & Booking        │
-                    │ • Trip Management         │
-                    │ • Profile Management      │
-                    └───────────────────────────┘
-```
+<p align="center">
+  <img src="images/meTTa_Archie.jpg" alt="MeTTa Archie" width="100%"/>
+</p>
+
+## Project WorkFlow
+
+<p align="center">
+  <img src="images/u.jpeg" alt="MeTTa Archie" width="100%"/>
+</p>
+
+
 
 ##  Prerequisites
 
