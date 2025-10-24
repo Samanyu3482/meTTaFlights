@@ -1,4 +1,4 @@
-# MeTTa Flight Search & Booking System
+# MeTTa Flight Search & MeTTa-AI
 
 A comprehensive flight search and booking platform featuring a modern Next.js frontend, multiple specialized search APIs, authentication system, and unified booking capabilities.
 
